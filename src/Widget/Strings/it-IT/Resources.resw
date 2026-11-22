@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="WidgetName" xml:space="preserve"><value>Device Battery Control</value></data>
+  <data name="Devices" xml:space="preserve"><value>I tuoi dispositivi</value></data>
+  <data name="ConnectedCount" xml:space="preserve"><value>{0} dispositivi connessi</value></data>
+  <data name="NoConnected" xml:space="preserve"><value>Nessuna lettura batteria</value></data>
+  <data name="NoDevices" xml:space="preserve"><value>Nessun dispositivo associato</value></data>
+  <data name="EmptyHint" xml:space="preserve"><value>Connetti un dispositivo Bluetooth nelle Impostazioni di Windows, poi aggiorna. I dispositivi vengono mostrati anche quando non comunicano il livello della batteria.</value></data>
+  <data name="Connected" xml:space="preserve"><value>Connesso</value></data>
+  <data name="Disconnected" xml:space="preserve"><value>Disconnesso · ultimo livello noto</value></data>
+  <data name="DisconnectedOnly" xml:space="preserve"><value>Disconnesso</value></data>
+  <data name="BatteryUnavailable" xml:space="preserve"><value>Livello batteria non disponibile</value></data>
+  <data name="LowBattery" xml:space="preserve"><value>Batteria scarica</value></data>
+  <data name="LastKnown" xml:space="preserve"><value>Ultima lettura nota</value></data>
+  <data name="History" xml:space="preserve"><value>Andamento della batteria</value></data>
+  <data name="Last24Hours" xml:space="preserve"><value>Ultime 24 ore</value></data>
+  <data name="HoursAgo" xml:space="preserve"><value>24 ore fa</value></data>
+  <data name="Now" xml:space="preserve"><value>Ora</value></data>
+  <data name="HistoryEmpty" xml:space="preserve"><value>Il grafico apparirà con le prossime letture. Mantieni attivo il widget per costruire lo storico.</value></data>
+  <data name="HistoryHint" xml:space="preserve"><value>Letture reali della batteria. Le interruzioni indicano letture mancanti; ricarica e autonomia residua non vengono stimate.</value></data>
+  <data name="Details" xml:space="preserve"><value>Dettagli del dispositivo</value></data>
+  <data name="Connection" xml:space="preserve"><value>Connessione</value></data>
+  <data name="Source" xml:space="preserve"><value>Origine della lettura</value></data>
+  <data name="LastReading" xml:space="preserve"><value>Ultima lettura</value></data>
+  <data name="ChargeState" xml:space="preserve"><value>Stato di ricarica</value></data>
+  <data name="StateUnavailable" xml:space="preserve"><value>Non comunicato dal dispositivo</value></data>
+  <data name="WindowsSource" xml:space="preserve"><value>Bluetooth di Windows</value></data>
+  <data name="BleSource" xml:space="preserve"><value>Bluetooth LE · servizio batteria</value></data>
+  <data name="OpenBluetooth" xml:space="preserve"><value>Apri impostazioni Bluetooth</value></data>
+  <data name="SupportHint" xml:space="preserve"><value>Sono supportati Bluetooth, HID standard e i protocolli proprietari integrati. I dati disponibili dipendono dal dispositivo e dal firmware; le percentuali non disponibili sono indicate con —.</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Aggiorna dispositivi</value></data>
+  <data name="AccessDenied" xml:space="preserve"><value>Windows ha negato l’accesso al Bluetooth. Controlla le autorizzazioni nelle Impostazioni di Windows e riprova.</value></data>
+  <data name="RefreshFailed" xml:space="preserve"><value>Impossibile aggiornare i dispositivi. Le ultime letture restano disponibili. Prova ad aggiornare nuovamente.</value></data>
+  <data name="Demo" xml:space="preserve"><value>Demo · dispositivi di esempio</value></data>
+  <data name="ChartSummary" xml:space="preserve"><value>Storico batteria: minimo {0}%, massimo {1}%, {2} letture.</value></data>
+  <data name="Settings" xml:space="preserve"><value>Impostazioni del widget</value></data>
+  <data name="SettingsDescription" xml:space="preserve"><value>Scegli cosa mostrare sulla taskbar e la frequenza di aggiornamento delle batterie.</value></data>
+  <data name="PreviewCount" xml:space="preserve"><value>Dispositivi sulla taskbar</value></data>
+  <data name="DeviceCount" xml:space="preserve"><value>{0} dispositivi</value></data>
+  <data name="PinnedDevice" xml:space="preserve"><value>Dispositivo preferito</value></data>
+  <data name="Automatic" xml:space="preserve"><value>Automatico · prima la batteria più bassa</value></data>
+  <data name="SavedDevice" xml:space="preserve"><value>Dispositivo selezionato in precedenza</value></data>
+  <data name="RefreshInterval" xml:space="preserve"><value>Intervallo di aggiornamento</value></data>
+  <data name="Minutes" xml:space="preserve"><value>{0} minuti</value></data>
+  <data name="LowThreshold" xml:space="preserve"><value>Soglia batteria scarica (%)</value></data>
+  <data name="ShowDisconnected" xml:space="preserve"><value>Mostra dispositivi disconnessi</value></data>
+  <data name="KeepHistory" xml:space="preserve"><value>Registra lo storico della batteria</value></data>
+  <data name="HistoryDescription" xml:space="preserve"><value>Le letture restano sul PC per un massimo di 24 ore, con un limite di 288 campioni per dispositivo e 32 dispositivi. Disattivando l’opzione si interrompe la registrazione per questa istanza; lo storico esistente scade dopo 24 ore. Le istanze condividono lo storico.</value></data>
+  <data name="On" xml:space="preserve"><value>Attivo</value></data>
+  <data name="Off" xml:space="preserve"><value>Disattivo</value></data>
+  <data name="SystemTheme" xml:space="preserve"><value>Tema di sistema</value></data>
+  <data name="LightTheme" xml:space="preserve"><value>Chiaro</value></data>
+  <data name="DarkTheme" xml:space="preserve"><value>Scuro</value></data>
+  <data name="Back" xml:space="preserve"><value>Indietro</value></data>
+  <data name="SelectDevice" xml:space="preserve"><value>Seleziona un dispositivo</value></data>
+  <data name="SearchDevices" xml:space="preserve"><value>Cerca tra i tuoi dispositivi</value></data>
+  <data name="NoSearchResults" xml:space="preserve"><value>Nessun dispositivo corrispondente</value></data>
+  <data name="BackToDevices" xml:space="preserve"><value>Torna ai dispositivi</value></data>
+  <data name="HomeNote" xml:space="preserve"><value>Livelli di batteria comunicati dai tuoi dispositivi.</value></data>
+  <data name="NoBatteryReading" xml:space="preserve"><value>Nessuna lettura batteria disponibile</value></data>
+  <data name="UpdatedAt" xml:space="preserve"><value>Aggiornato {0}</value></data>
+  <data name="LivePreview" xml:space="preserve"><value>Anteprima in tempo reale</value></data>
+  <data name="TaskbarPreview" xml:space="preserve"><value>Anteprima sulla taskbar</value></data>
+  <data name="DataSection" xml:space="preserve"><value>Dati</value></data>
+  <data name="PreviewWidth" xml:space="preserve"><value>{0} px</value></data>
+  <data name="BatteryLevel" xml:space="preserve"><value>Livello batteria</value></data>
+  <data name="Unavailable" xml:space="preserve"><value>Non disponibile</value></data>
+  <data name="ReceiverBatteryUnavailable" xml:space="preserve"><value>Ricevitore USB · batteria non esposta</value></data>
+  <data name="ReceiverPresent" xml:space="preserve"><value>Ricevitore USB rilevato</value></data>
+  <data name="UsbSource" xml:space="preserve"><value>USB HID</value></data>
+  <data name="Asleep" xml:space="preserve"><value>In sospensione · ultima lettura nota</value></data>
+  <data name="Charging" xml:space="preserve"><value>In carica</value></data>
+  <data name="CoarseBattery" xml:space="preserve"><value>Livello batteria approssimativo</value></data>
+  <data name="ProtocolSource" xml:space="preserve"><value>Protocollo del dispositivo</value></data>
+  <data name="DeviceBatteryDetails" xml:space="preserve"><value>Dettagli della batteria</value></data>
+  <data name="Voltage" xml:space="preserve"><value>Tensione</value></data>
+  <data name="ProtocolUnavailable" xml:space="preserve"><value>Il motore dei protocolli non ha completato questo aggiornamento. Le letture Windows disponibili restano visibili; prova ad aggiornare nuovamente.</value></data>
+  <data name="ProtocolTimeout" xml:space="preserve"><value>Tempo di aggiornamento dei protocolli scaduto.</value></data>
+  <data name="PartialData" xml:space="preserve"><value>Non è stato possibile aggiornare alcuni dispositivi. Le letture disponibili restano visibili.</value></data>
+  <data name="UsbCable" xml:space="preserve"><value>Cavo USB</value></data>
+  <data name="WirelessReceiver" xml:space="preserve"><value>Ricevitore a 2,4 GHz</value></data>
+  <data name="LevelLow" xml:space="preserve"><value>Bassa</value></data>
+  <data name="LevelCritical" xml:space="preserve"><value>Critica</value></data>
+  <data name="LevelMedium" xml:space="preserve"><value>Media</value></data>
+  <data name="LevelHigh" xml:space="preserve"><value>Alta</value></data>
+  <data name="LevelFull" xml:space="preserve"><value>Carica</value></data>
+  <data name="LevelEmpty" xml:space="preserve"><value>Scarica</value></data>
+</root>

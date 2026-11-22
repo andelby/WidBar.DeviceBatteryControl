@@ -1,0 +1,19 @@
+<UserControl x:Class="DeviceBatteryControl.Controls.BatteryPreviewView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="TaskbarDeviceIconStyle" TargetType="FontIcon" BasedOn="{StaticResource FluentFontIconStyle}">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="10,0" Background="Transparent">
+        <StackPanel x:Name="DevicesPanel" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center" />
+        <StackPanel x:Name="EmptyPanel" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <FontIcon Glyph="&#xE975;" Style="{StaticResource TaskbarDeviceIconStyle}" />
+            <TextBlock x:Name="EmptyText" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</UserControl>

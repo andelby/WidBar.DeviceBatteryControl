@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="WidgetName" xml:space="preserve"><value>Device Battery Control</value></data>
+  <data name="Devices" xml:space="preserve"><value>Your devices</value></data>
+  <data name="ConnectedCount" xml:space="preserve"><value>{0} connected devices</value></data>
+  <data name="NoConnected" xml:space="preserve"><value>No battery readings</value></data>
+  <data name="NoDevices" xml:space="preserve"><value>No paired devices found</value></data>
+  <data name="EmptyHint" xml:space="preserve"><value>Connect a Bluetooth device in Windows Settings, then refresh. Devices appear even when they do not report a battery level.</value></data>
+  <data name="Connected" xml:space="preserve"><value>Connected</value></data>
+  <data name="Disconnected" xml:space="preserve"><value>Disconnected · last known level</value></data>
+  <data name="DisconnectedOnly" xml:space="preserve"><value>Disconnected</value></data>
+  <data name="BatteryUnavailable" xml:space="preserve"><value>Battery level unavailable</value></data>
+  <data name="LowBattery" xml:space="preserve"><value>Low battery</value></data>
+  <data name="LastKnown" xml:space="preserve"><value>Last known reading</value></data>
+  <data name="History" xml:space="preserve"><value>Battery history</value></data>
+  <data name="Last24Hours" xml:space="preserve"><value>Last 24 hours</value></data>
+  <data name="HoursAgo" xml:space="preserve"><value>24 h ago</value></data>
+  <data name="Now" xml:space="preserve"><value>Now</value></data>
+  <data name="HistoryEmpty" xml:space="preserve"><value>The chart appears as readings arrive. Keep the widget active to build a history.</value></data>
+  <data name="HistoryHint" xml:space="preserve"><value>Actual battery readings. Gaps indicate missing observations; charging and remaining time are not inferred.</value></data>
+  <data name="Details" xml:space="preserve"><value>Device details</value></data>
+  <data name="Connection" xml:space="preserve"><value>Connection</value></data>
+  <data name="Source" xml:space="preserve"><value>Battery source</value></data>
+  <data name="LastReading" xml:space="preserve"><value>Last reading</value></data>
+  <data name="ChargeState" xml:space="preserve"><value>Charging state</value></data>
+  <data name="StateUnavailable" xml:space="preserve"><value>Not reported by device</value></data>
+  <data name="WindowsSource" xml:space="preserve"><value>Windows Bluetooth</value></data>
+  <data name="BleSource" xml:space="preserve"><value>Bluetooth LE · Battery Service</value></data>
+  <data name="OpenBluetooth" xml:space="preserve"><value>Open Bluetooth settings</value></data>
+  <data name="SupportHint" xml:space="preserve"><value>Bluetooth, standard HID and the built-in device protocols are supported. Available values depend on the device and firmware; unavailable percentages are shown as —.</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Refresh devices</value></data>
+  <data name="AccessDenied" xml:space="preserve"><value>Windows denied access to Bluetooth. Check device permissions in Windows Settings, then try again.</value></data>
+  <data name="RefreshFailed" xml:space="preserve"><value>Could not update devices. Your last readings are still available. Try refreshing again.</value></data>
+  <data name="Demo" xml:space="preserve"><value>Demo · sample devices</value></data>
+  <data name="ChartSummary" xml:space="preserve"><value>Battery history: minimum {0}%, maximum {1}%, {2} observations.</value></data>
+  <data name="Settings" xml:space="preserve"><value>Widget settings</value></data>
+  <data name="SettingsDescription" xml:space="preserve"><value>Choose what appears on the taskbar and how often battery levels are checked.</value></data>
+  <data name="PreviewCount" xml:space="preserve"><value>Devices on the taskbar</value></data>
+  <data name="DeviceCount" xml:space="preserve"><value>{0} device(s)</value></data>
+  <data name="PinnedDevice" xml:space="preserve"><value>Preferred device</value></data>
+  <data name="Automatic" xml:space="preserve"><value>Automatic · lowest battery first</value></data>
+  <data name="SavedDevice" xml:space="preserve"><value>Previously selected device</value></data>
+  <data name="RefreshInterval" xml:space="preserve"><value>Refresh interval</value></data>
+  <data name="Minutes" xml:space="preserve"><value>{0} minute(s)</value></data>
+  <data name="LowThreshold" xml:space="preserve"><value>Low battery threshold (%)</value></data>
+  <data name="ShowDisconnected" xml:space="preserve"><value>Show disconnected devices</value></data>
+  <data name="KeepHistory" xml:space="preserve"><value>Record battery history</value></data>
+  <data name="HistoryDescription" xml:space="preserve"><value>Readings are stored locally for up to 24 hours, with at most 288 samples per device and 32 devices. Disabling this stops new history recording for this instance; existing history expires after 24 hours. Instances share history.</value></data>
+  <data name="On" xml:space="preserve"><value>On</value></data>
+  <data name="Off" xml:space="preserve"><value>Off</value></data>
+  <data name="SystemTheme" xml:space="preserve"><value>System theme</value></data>
+  <data name="LightTheme" xml:space="preserve"><value>Light</value></data>
+  <data name="DarkTheme" xml:space="preserve"><value>Dark</value></data>
+  <data name="Back" xml:space="preserve"><value>Back</value></data>
+  <data name="SelectDevice" xml:space="preserve"><value>Select a device</value></data>
+  <data name="SearchDevices" xml:space="preserve"><value>Search your devices</value></data>
+  <data name="NoSearchResults" xml:space="preserve"><value>No matching devices</value></data>
+  <data name="BackToDevices" xml:space="preserve"><value>Back to devices</value></data>
+  <data name="HomeNote" xml:space="preserve"><value>Battery levels reported by your connected devices.</value></data>
+  <data name="NoBatteryReading" xml:space="preserve"><value>No battery reading available</value></data>
+  <data name="UpdatedAt" xml:space="preserve"><value>Updated {0}</value></data>
+  <data name="LivePreview" xml:space="preserve"><value>Live preview</value></data>
+  <data name="TaskbarPreview" xml:space="preserve"><value>Taskbar preview</value></data>
+  <data name="DataSection" xml:space="preserve"><value>Data</value></data>
+  <data name="PreviewWidth" xml:space="preserve"><value>{0} px</value></data>
+  <data name="BatteryLevel" xml:space="preserve"><value>Battery level</value></data>
+  <data name="Unavailable" xml:space="preserve"><value>Unavailable</value></data>
+  <data name="ReceiverBatteryUnavailable" xml:space="preserve"><value>USB receiver · battery not exposed</value></data>
+  <data name="ReceiverPresent" xml:space="preserve"><value>USB receiver detected</value></data>
+  <data name="UsbSource" xml:space="preserve"><value>USB HID</value></data>
+  <data name="Asleep" xml:space="preserve"><value>Sleeping · last known reading</value></data>
+  <data name="Charging" xml:space="preserve"><value>Charging</value></data>
+  <data name="CoarseBattery" xml:space="preserve"><value>Approximate battery level</value></data>
+  <data name="ProtocolSource" xml:space="preserve"><value>Device protocol</value></data>
+  <data name="DeviceBatteryDetails" xml:space="preserve"><value>Battery details</value></data>
+  <data name="Voltage" xml:space="preserve"><value>Voltage</value></data>
+  <data name="ProtocolUnavailable" xml:space="preserve"><value>The device protocol engine could not complete this refresh. Available Windows readings remain visible; try refreshing again.</value></data>
+  <data name="ProtocolTimeout" xml:space="preserve"><value>The device protocol refresh timed out.</value></data>
+  <data name="PartialData" xml:space="preserve"><value>Some device data could not be refreshed. Available readings remain visible.</value></data>
+  <data name="UsbCable" xml:space="preserve"><value>USB cable</value></data>
+  <data name="WirelessReceiver" xml:space="preserve"><value>2.4 GHz receiver</value></data>
+  <data name="LevelLow" xml:space="preserve"><value>Low</value></data>
+  <data name="LevelCritical" xml:space="preserve"><value>Critical</value></data>
+  <data name="LevelMedium" xml:space="preserve"><value>Medium</value></data>
+  <data name="LevelHigh" xml:space="preserve"><value>High</value></data>
+  <data name="LevelFull" xml:space="preserve"><value>Full</value></data>
+  <data name="LevelEmpty" xml:space="preserve"><value>Empty</value></data>
+</root>

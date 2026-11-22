@@ -8,3 +8,10 @@ third_party/
 .claude/
 CLAUDE.md
 AGENTS.md
+
+artifacts/
+**/bin/
+**/obj/
+.vs/
+*.user
+**/AppPackages/

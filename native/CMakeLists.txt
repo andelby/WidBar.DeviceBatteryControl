@@ -1,0 +1,62 @@
+cmake_minimum_required(VERSION 3.24)
+project(BatteryProtocols LANGUAGES CXX)
+
+file(GLOB protocol_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/drivers/*.cpp")
+add_executable(BatteryProtocols
+    protocol_main.cpp
+    src/devices.cpp
+    src/hid.cpp
+    ${protocol_sources})
+target_compile_features(BatteryProtocols PRIVATE cxx_std_17)
+target_compile_definitions(BatteryProtocols PRIVATE
+    UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN
+    _WIN32_WINNT=0x0A00 WINVER=0x0A00 _CRT_SECURE_NO_WARNINGS)
+target_include_directories(BatteryProtocols PRIVATE src)
+target_link_libraries(BatteryProtocols PRIVATE
+    hid setupapi cfgmgr32 ole32 oleaut32 runtimeobject ws2_32
+    winhttp bcrypt version bluetoothapis advapi32 user32 uuid)
+if(MSVC)
+    target_compile_options(BatteryProtocols PRIVATE /W3 /utf-8 /EHsc /Gy /MP2)
+    set_property(TARGET BatteryProtocols PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    target_link_options(BatteryProtocols PRIVATE $<$<CONFIG:Release>:/OPT:REF> $<$<CONFIG:Release>:/OPT:ICF>)
+endif()
+
+include(CTest)
+if(BUILD_TESTING)
+    foreach(name IN ITEMS airpods galaxy_buds gamesir_ble incott jbl_speaker nothing_ear
+            nuphy phonelink rapoo rawm sony_headphones sony_inzone soundcore)
+        add_executable(${name}_protocol_test tests/${name}_protocol_test.cpp)
+        target_compile_features(${name}_protocol_test PRIVATE cxx_std_17)
+        target_compile_definitions(${name}_protocol_test PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN _CRT_SECURE_NO_WARNINGS)
+        target_include_directories(${name}_protocol_test PRIVATE src)
+        if(MSVC)
+            target_compile_options(${name}_protocol_test PRIVATE /utf-8 /UNDEBUG)
+        endif()
+        add_test(NAME ${name}_protocol COMMAND ${name}_protocol_test)
+    endforeach()
+    foreach(name IN ITEMS gamesir_sapjoy vgn xenta)
+        add_executable(${name}_protocol_test tests/${name}_protocol_test.cpp src/drivers/${name}_protocol.cpp)
+        target_compile_features(${name}_protocol_test PRIVATE cxx_std_17)
+        target_compile_definitions(${name}_protocol_test PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN _CRT_SECURE_NO_WARNINGS)
+        target_include_directories(${name}_protocol_test PRIVATE src)
+        if(MSVC)
+            target_compile_options(${name}_protocol_test PRIVATE /utf-8 /UNDEBUG)
+        endif()
+        add_test(NAME ${name}_protocol COMMAND ${name}_protocol_test)
+    endforeach()
+    add_executable(keychron_driver_test tests/keychron_driver_test.cpp src/drivers/keychron.cpp)
+    target_compile_features(keychron_driver_test PRIVATE cxx_std_17)
+    target_compile_definitions(keychron_driver_test PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN _CRT_SECURE_NO_WARNINGS)
+    if(MSVC)
+        target_compile_options(keychron_driver_test PRIVATE /utf-8 /UNDEBUG)
+    endif()
+    target_link_libraries(keychron_driver_test PRIVATE setupapi cfgmgr32 ole32)
+    add_test(NAME keychron_driver COMMAND keychron_driver_test)
+    add_executable(json_output_test tests/json_output_test.cpp)
+    target_compile_features(json_output_test PRIVATE cxx_std_17)
+    target_compile_definitions(json_output_test PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+    if(MSVC)
+        target_compile_options(json_output_test PRIVATE /utf-8 /UNDEBUG)
+    endif()
+    add_test(NAME json_output COMMAND json_output_test)
+endif()

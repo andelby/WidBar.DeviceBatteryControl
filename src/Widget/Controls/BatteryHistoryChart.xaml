@@ -1,0 +1,19 @@
+<UserControl x:Class="DeviceBatteryControl.Controls.BatteryHistoryChart"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid RowSpacing="5" ColumnSpacing="8">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="28" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <Grid><TextBlock Text="100" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" /><TextBlock Text="0" FontSize="10" VerticalAlignment="Bottom" Foreground="{ThemeResource TextFillColorSecondaryBrush}" /></Grid>
+        <Grid Grid.Column="1">
+            <Rectangle Height="1" VerticalAlignment="Top" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+            <Rectangle Height="1" VerticalAlignment="Center" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+            <Rectangle Height="1" VerticalAlignment="Bottom" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+            <Canvas x:Name="Plot" SizeChanged="OnSizeChanged" />
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <TextBlock x:Name="StartLabel" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <TextBlock x:Name="EndLabel" FontSize="10" HorizontalAlignment="Right" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Grid>
+    </Grid>
+</UserControl>

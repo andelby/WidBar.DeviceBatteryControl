@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="DeviceBatteryControl.Pages.BatterySettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:views="using:DeviceBatteryControl.Controls"
+    Background="Transparent">
+    <UserControl.Resources>
+        <Style x:Key="CardExpanderStyle" TargetType="Expander">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="MinHeight" Value="68" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+            <Setter Property="Margin" Value="1,24,0,4" />
+        </Style>
+        <Style x:Key="CardComboStyle" TargetType="ComboBox" BasedOn="{StaticResource DefaultComboBoxStyle}">
+            <Setter Property="MinWidth" Value="200" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+        <StackPanel Padding="0,0,0,8">
+            <Border Padding="16" CornerRadius="{StaticResource ControlCornerRadius}"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <Grid RowSpacing="12">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock x:Name="LivePreviewHeader" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock x:Name="LivePreviewNote" Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <TextBlock x:Name="PreviewWidthText" Grid.Column="1" VerticalAlignment="Center"
+                                   Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                    <Border Grid.Row="1" Height="72" CornerRadius="{StaticResource ControlCornerRadius}"
+                            Background="{ThemeResource LayerFillColorAltBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                        <ContentControl x:Name="SampleHost" Height="48" Padding="12,5"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                    </Border>
+                </Grid>
+            </Border>
+        </StackPanel>
+        <ScrollViewer x:Name="SettingsScroller" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+            <StackPanel Spacing="4">
+                <TextBlock x:Name="PreviewSectionText" Margin="1,20,0,4" Style="{StaticResource SectionHeaderStyle}" />
+                <views:SettingsCard x:Name="CountCard" Glyph="&#xF0E2;">
+                    <ComboBox x:Name="PreviewCount" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
+                </views:SettingsCard>
+                <views:SettingsCard x:Name="PinnedCard" Glyph="&#xE718;">
+                    <ComboBox x:Name="PinnedDevice" Style="{StaticResource CardComboStyle}" DisplayMemberPath="Name" SelectionChanged="OnChanged" />
+                </views:SettingsCard>
+                <views:SettingsCard x:Name="ThresholdCard" Glyph="&#xE7BA;">
+                    <NumberBox x:Name="Threshold" Width="120" Minimum="5" Maximum="50" SpinButtonPlacementMode="Compact" ValueChanged="OnNumberChanged" />
+                </views:SettingsCard>
+                <TextBlock x:Name="DataSectionText" Style="{StaticResource SectionHeaderStyle}" />
+                <views:SettingsCard x:Name="RefreshCard" Glyph="&#xE72C;">
+                    <ComboBox x:Name="RefreshInterval" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
+                </views:SettingsCard>
+                <views:SettingsCard x:Name="DisconnectedCard" Glyph="&#xE702;">
+                    <ToggleSwitch x:Name="DisconnectedToggle" Toggled="OnToggled" />
+                </views:SettingsCard>
+                <views:SettingsCard x:Name="HistoryCard" Glyph="&#xE9D9;">
+                    <ToggleSwitch x:Name="HistoryToggle" Toggled="OnToggled" />
+                </views:SettingsCard>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

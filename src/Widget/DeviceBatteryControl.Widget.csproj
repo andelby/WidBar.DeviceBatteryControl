@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <UseWinUI>true</UseWinUI>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>DeviceBatteryControl</RootNamespace>
+    <AssemblyName>WidBar.DeviceBatteryControl.Widget</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <SelfContained>true</SelfContained>
+    <PublishReadyToRun Condition="'$(Configuration)' == 'Release'">true</PublishReadyToRun>
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+    <RepositoryRoot>$(MSBuildThisFileDirectory)..\..\</RepositoryRoot>
+    <NativeBuildDirectory>$(RepositoryRoot)artifacts\native</NativeBuildDirectory>
+    <NativeBuildDirectory Condition="'$(Platform)' == 'ARM64'">$(RepositoryRoot)artifacts\native-arm64</NativeBuildDirectory>
+    <WidBarPluginId>com.widbar.devicebatterycontrol</WidBarPluginId>
+    <WidBarPluginName>Device Battery Control</WidBarPluginName>
+    <WidBarPluginDescription>Battery levels and history for connected devices.</WidBarPluginDescription>
+    <WidBarPluginCategory>System</WidBarPluginCategory>
+    <WidBarPluginVersion>0.2.0</WidBarPluginVersion>
+    <WidBarPluginPreviewWidth>176</WidBarPluginPreviewWidth>
+    <WidBarPluginConfigurable>true</WidBarPluginConfigurable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+    <Content Include="Strings\**\*.resw" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(NativeBuildDirectory)\$(Configuration)\BatteryProtocols.exe" Link="Native\BatteryProtocols\BatteryProtocols.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(RepositoryRoot)artifacts\dependencies\headsetcontrol.exe" Link="Native\BatteryProtocols\headsetcontrol.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(RepositoryRoot)artifacts\dependencies\HeadsetControlSource.tgz" Link="Native\BatteryProtocols\Sources\HeadsetControlSource.tgz" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(RepositoryRoot)LICENSE" Link="Native\BatteryProtocols\LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(RepositoryRoot)THIRD_PARTY_NOTICES.md" Link="Native\BatteryProtocols\THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(RepositoryRoot)artifacts\dependencies\ProtocolSources.zip" Link="Native\BatteryProtocols\Sources\ProtocolSources.zip" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.4" />
+    <PackageReference Include="WidBar.SDK" Version="2.3.5" />
+    <PublishReadyToRunExclude Include="Microsoft.Windows.SDK.NET.dll" />
+  </ItemGroup>
+  <Target Name="BuildDeviceProtocols" BeforeTargets="BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true' and '$(SkipNativeBuild)' != 'true'">
+    <Exec Command="pwsh -NoProfile -File &quot;$(RepositoryRoot)tools\Build-Native.ps1&quot; -Configuration $(Configuration) -Architecture $(Platform)" />
+  </Target>
+</Project>

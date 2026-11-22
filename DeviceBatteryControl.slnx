@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations><Platform Name="x64" /><Platform Name="ARM64" /></Configurations>
+  <Folder Name="Widget">
+    <Project Path="src/Widget/DeviceBatteryControl.Widget.csproj" />
+    <Project Path="packaging/DeviceBatteryControl.Package.wapproj" Type="c7167f0d-bc9f-4e6e-afe1-012c56b48db5"><Deploy /></Project>
+  </Folder>
+  <Folder Name="Tests"><Project Path="tests/Widget.Tests/Widget.Tests.csproj" /></Folder>
+</Solution>
