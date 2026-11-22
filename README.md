@@ -111,7 +111,11 @@ and hover values retain every saved observation. The entrance runs through Windo
 Composition and respects the system animation setting. The native color picker
 is created only when opened; appearance changes do not start device discovery.
 
+Taskbar items use compiled x:Bind and reuse their native controls between readings.
+Device details load on their first visit. History snapshots and chart projections
+are cached, and hover lookup uses binary search.
+
 ## License
 
 GPL version 3. Original authorship and history are preserved. See
-[LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
+[LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.txt).

@@ -23,6 +23,9 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
     private bool _detail;
     private Storyboard? _refreshAnimation;
     private string _pillSignature = "";
+    private bool _detailLoaded;
+    private readonly Windows.UI.ViewManagement.UISettings _uiSettings = new();
+    private IReadOnlyList<BatteryStatRow> _stats = [];
 
     public BatteryFlyoutPage(BatteryMonitor monitor, BatterySettings settings)
     {
@@ -31,7 +34,6 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         InitializeComponent();
         DeviceList.ItemsSource = _rows;
         ScrollBarAutoHide.Attach(HomePage);
-        ScrollBarAutoHide.Attach(DetailPage);
         HeaderTitle.Text = BatteryLoc.Get("WidgetName");
         DevicesHeading.Text = BatteryLoc.Get("Devices");
         DevicesHint.Text = BatteryLoc.Get("SelectDevice");
@@ -39,11 +41,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         AutomationProperties.SetName(SearchBox, BatteryLoc.Get("SearchDevices"));
         EmptyTitle.Text = BatteryLoc.Get("NoDevices");
         EmptyHint.Text = BatteryLoc.Get("EmptyHint");
-        HistoryHeading.Text = BatteryLoc.Get("History");
-        HistoryRange.Text = "";
-        DetailsHeading.Text = BatteryLoc.Get("Details");
         BluetoothSettings.Content = BatteryLoc.Get("OpenBluetooth");
-        SupportHint.Text = BatteryLoc.Get("SupportHint");
         HomeNote.Text = Environment.GetCommandLineArgs().Contains("--demo") ? BatteryLoc.Get("Demo") : BatteryLoc.Get("HomeNote");
         Describe(RefreshButton, "Refresh");
         Describe(BackButton, "BackToDevices");
@@ -81,12 +79,12 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
     private void Render()
     {
         RefreshButton.IsEnabled = !_monitor.IsRefreshing;
-        if (_active && _monitor.IsRefreshing && new Windows.UI.ViewManagement.UISettings().AnimationsEnabled)
+        if (_active && _monitor.IsRefreshing && _uiSettings.AnimationsEnabled)
             StartRefreshAnimation();
         else StopRefreshAnimation();
         ErrorBar.IsOpen = _monitor.Error is not null;
         ErrorBar.Message = _monitor.Error is null ? "" : BatteryLoc.Get(_monitor.Error);
-        RenderRows();
+        if (!_detail) RenderRows();
         if (_detail)
         {
             var selected = VisibleDevices().FirstOrDefault(x => x.Id == _selectedId);
@@ -113,7 +111,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
                 _rows.Insert(position, row);
             }
             else if (_rows.IndexOf(row) != position) _rows.Move(_rows.IndexOf(row), position);
-            row.Update(device, _settings, _settings.KeepHistory ? _monitor.History.Get(device.Id, DateTimeOffset.UtcNow) : [], position == 0);
+            row.Update(device, _settings, _settings.KeepHistory ? _monitor.GetHistory(device.Id) : [], position == 0);
         }
         for (var i = _rows.Count - 1; i >= 0; i--)
             if (!seen.Contains(_rows[i].DeviceId)) _rows.RemoveAt(i);
@@ -130,6 +128,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
     {
         var device = VisibleDevices().FirstOrDefault(x => x.Id == id);
         if (device is null) return;
+        EnsureDetail();
         _selectedId = id;
         _detail = true;
         HomePage.Visibility = Visibility.Collapsed;
@@ -138,19 +137,30 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         RenderDetails(device);
         HistoryChart.PlayEntrance();
         DetailPage.ChangeView(null, 0, null, true);
-        if (new Windows.UI.ViewManagement.UISettings().AnimationsEnabled)
+        if (_uiSettings.AnimationsEnabled)
             Motion.Enter(new UIElement[] { HeroSection, HistorySection, DetailsSection }, new Vector3(24, 0, 0));
     }
     private void OnBackClicked(object sender, RoutedEventArgs args) => ShowHome();
+    private void EnsureDetail()
+    {
+        if (_detailLoaded) return;
+        _ = FindName(nameof(DetailPage));
+        ScrollBarAutoHide.Attach(DetailPage);
+        HistoryHeading.Text = BatteryLoc.Get("History");
+        DetailsHeading.Text = BatteryLoc.Get("Details");
+        SupportHint.Text = BatteryLoc.Get("SupportHint");
+        _detailLoaded = true;
+    }
     private void ShowHome()
     {
         _detail = false;
+        RenderRows();
         DetailPage.Visibility = Visibility.Collapsed;
         HomePage.Visibility = Visibility.Visible;
         BackButton.Visibility = Visibility.Collapsed;
         HeaderTitle.Text = BatteryLoc.Get("WidgetName");
         HeaderSubtitle.Text = BatteryLoc.Format("ConnectedCount", _monitor.Devices.Count(x => x.IsConnected));
-        if (_active && new Windows.UI.ViewManagement.UISettings().AnimationsEnabled)
+        if (_active && _uiSettings.AnimationsEnabled)
             Motion.Enter(new UIElement[] { SearchBox, DevicesSection, HomeNote }, new Vector3(-24, 0, 0));
     }
 
@@ -165,7 +175,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         HeroUpdated.Text = device.LastReading is null ? BatteryLoc.Get("NoBatteryReading")
             : BatteryLoc.Format("UpdatedAt", device.LastReading.Value.ToLocalTime().ToString("g", BatteryLoc.FormattingCulture));
         HistorySection.Visibility = _settings.KeepHistory && !device.IsReceiverOnly ? Visibility.Visible : Visibility.Collapsed;
-        var samples = _monitor.History.Get(device.Id, DateTimeOffset.UtcNow);
+        var samples = _monitor.GetHistory(device.Id);
         HistoryRange.Text = BatteryLoc.Format("SampleCount", samples.Count);
         HistoryChart.SetSamples(samples, _settings, device.Kind);
         HistoryHint.Text = BatteryLoc.Get(samples.Count == 1 ? "HistorySingle" : samples.Count == 0 ? "HistoryEmpty" : "HistoryHint");
@@ -178,7 +188,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         };
         if (!string.IsNullOrWhiteSpace(device.BatteryDetails)) stats.Add(new(BatteryLoc.Get("DeviceBatteryDetails"), device.BatteryDetails));
         if (device.Millivolts.HasValue) stats.Add(new(BatteryLoc.Get("Voltage"), device.Millivolts.Value.ToString(BatteryLoc.FormattingCulture) + " mV"));
-        DeviceStats.ItemsSource = stats;
+        if (!_stats.SequenceEqual(stats)) { _stats = stats; DeviceStats.ItemsSource = stats; }
         RenderPills();
     }
     private void RenderPills()

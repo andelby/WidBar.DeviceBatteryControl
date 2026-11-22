@@ -4,6 +4,7 @@ public sealed record BatteryChartPoint(DateTimeOffset Time, int Percentage, doub
 
 public sealed class BatteryChartSeries
 {
+    private IReadOnlyList<BatteryChartPoint>? _displayPoints;
     public IReadOnlyList<BatteryChartPoint> Points { get; }
     public double Minimum { get; }
     public double Maximum { get; }
@@ -34,13 +35,28 @@ public sealed class BatteryChartSeries
         return new(points, minimum, Math.Max(minimum + 1, maximum));
     }
 
-    public BatteryChartPoint? Nearest(double position) => Points.Count == 0 ? null
-        : Points.MinBy(x => Math.Abs(x.Position - Math.Clamp(position, 0, 1)));
+    public BatteryChartPoint? Nearest(double position)
+    {
+        if (Points.Count == 0) return null;
+        var target = double.IsNaN(position) ? 0 : Math.Clamp(position, 0, 1);
+        var low = 0;
+        var high = Points.Count;
+        while (low < high)
+        {
+            var middle = low + (high - low) / 2;
+            if (Points[middle].Position < target) low = middle + 1;
+            else high = middle;
+        }
+        if (low == 0) return Points[0];
+        if (low == Points.Count) return Points[^1];
+        return target - Points[low - 1].Position <= Points[low].Position - target ? Points[low - 1] : Points[low];
+    }
 
     public IReadOnlyList<BatteryChartPoint> DisplayPoints(int limit = 1024)
     {
         limit = Math.Max(4, limit);
         if (Points.Count <= limit) return Points;
+        if (limit == 1024 && _displayPoints is not null) return _displayPoints;
         var indices = new SortedSet<int> { 0, Points.Count - 1 };
         var bucketSize = (int)Math.Ceiling((Points.Count - 2d) / ((limit - 2) / 2));
         for (var start = 1; start < Points.Count - 1; start += bucketSize)
@@ -63,6 +79,9 @@ public sealed class BatteryChartSeries
             display.Add(Points[index] with { StartsSegment = gap });
             previous = index;
         }
+        if (limit == 1024) _displayPoints = display;
         return display;
     }
+
+    public BatteryChartSeries ForDisplay(int limit) => new(DisplayPoints(limit), Minimum, Maximum);
 }

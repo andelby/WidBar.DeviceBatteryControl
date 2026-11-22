@@ -21,7 +21,7 @@
     <WidBarPluginName>Device Battery Control</WidBarPluginName>
     <WidBarPluginDescription>Battery levels and history for connected devices.</WidBarPluginDescription>
     <WidBarPluginCategory>System</WidBarPluginCategory>
-    <WidBarPluginVersion>0.5.0</WidBarPluginVersion>
+    <WidBarPluginVersion>0.6.0</WidBarPluginVersion>
     <WidBarPluginPreviewWidth>176</WidBarPluginPreviewWidth>
     <WidBarPluginConfigurable>true</WidBarPluginConfigurable>
   </PropertyGroup>
@@ -32,7 +32,7 @@
     <Content Include="$(RepositoryRoot)artifacts\dependencies\headsetcontrol.exe" Link="Native\BatteryProtocols\headsetcontrol.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="$(RepositoryRoot)artifacts\dependencies\HeadsetControlSource.tgz" Link="Native\BatteryProtocols\Sources\HeadsetControlSource.tgz" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="$(RepositoryRoot)LICENSE" Link="Native\BatteryProtocols\LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="$(RepositoryRoot)THIRD_PARTY_NOTICES.md" Link="Native\BatteryProtocols\THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(RepositoryRoot)THIRD_PARTY_NOTICES.txt" Link="Native\BatteryProtocols\THIRD_PARTY_NOTICES.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="$(RepositoryRoot)artifacts\dependencies\ProtocolSources.zip" Link="Native\BatteryProtocols\Sources\ProtocolSources.zip" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.4" />
     <PackageReference Include="WidBar.SDK" Version="2.3.5" />

@@ -17,6 +17,7 @@ public sealed class BatteryMonitor : IAsyncDisposable
     private readonly CancellationTokenSource _lifetime = new();
     private readonly Dictionary<object, (bool Active, BatterySettings Settings)> _clients = [];
     private readonly BatteryHistoryStore _store;
+    private readonly BatteryHistoryCache _historyCache = new();
     private bool _dirty;
     private bool _disposed;
     private Task? _refresh;
@@ -54,12 +55,14 @@ public sealed class BatteryMonitor : IAsyncDisposable
     }
 
     public Task LoadHistoryAsync() => _historyLoad ??= LoadHistoryCoreAsync();
+    public IReadOnlyList<BatterySample> GetHistory(string id) => _historyCache.Get(History, id, DateTimeOffset.UtcNow);
 
     private async Task LoadHistoryCoreAsync()
     {
         try
         {
             History = await _store.LoadAsync(DateTimeOffset.UtcNow);
+            _historyCache.Invalidate();
         }
         catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException or ArgumentException)
         { Trace.WriteLine($"Battery history: {ex.Message}"); History = new(); }
@@ -100,12 +103,14 @@ public sealed class BatteryMonitor : IAsyncDisposable
         {
             var readings = await _provider.ReadAsync(_lifetime.Token);
             var now = DateTimeOffset.UtcNow;
-            if (_provider is ConnectedBatteryProvider connected) _dirty |= History.Remap(connected.IdentityAliases);
+            var historyChanged = _provider is ConnectedBatteryProvider connected && History.Remap(connected.IdentityAliases);
+            _dirty |= historyChanged;
             Devices = History.WithLastKnown(readings, now);
             _dirty |= History.Remember(Devices, now);
             if (_clients.Values.Any(x => x.Settings.KeepHistory))
                 foreach (var device in Devices.Where(x => x.LastReading is not null && (LastRefresh is null || x.LastReading > LastRefresh)))
-                    _dirty |= History.Add(device, device.LastReading!.Value);
+                    if (History.Add(device, device.LastReading!.Value)) { _dirty = true; historyChanged = true; }
+            if (historyChanged) _historyCache.Invalidate();
             LastRefresh = now;
             Error = (_provider as ConnectedBatteryProvider)?.WarningKey;
             RefreshCount++;

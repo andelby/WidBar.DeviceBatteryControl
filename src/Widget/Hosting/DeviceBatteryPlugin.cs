@@ -20,7 +20,7 @@ public sealed class DeviceBatteryPlugin : WidgetPluginBase, IConfigurableWidgetP
     private static readonly TimeSpan HideGrace = TimeSpan.FromSeconds(5);
     public override string Id => "com.widbar.devicebatterycontrol";
     public override string Name => "Device Battery Control";
-    public override string Version => "0.5.0";
+    public override string Version => "0.6.0";
     public override int PreviewLogicalWidth => _settings.GetPreviewWidth(_monitor?.Devices ?? []);
     public override bool IsPreviewVisible => _detailsVisible || BatterySelection.IsVisible(_monitor?.Devices ?? [], _settings)
         || DateTimeOffset.UtcNow - _lastConnected < HideGrace;

@@ -15,3 +15,6 @@ artifacts/
 .vs/
 *.user
 **/AppPackages/
+
+# Keep new Markdown notes local. Existing tracked documentation is preserved.
+*.[mM][dD]

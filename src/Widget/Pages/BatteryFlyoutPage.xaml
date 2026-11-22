@@ -128,7 +128,7 @@
                                TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
             </ScrollViewer>
-            <ScrollViewer x:Name="DetailPage" Visibility="Collapsed" VerticalScrollBarVisibility="Auto"
+            <ScrollViewer x:Name="DetailPage" x:Load="False" Visibility="Collapsed" VerticalScrollBarVisibility="Auto"
                           VerticalScrollMode="Enabled" HorizontalScrollMode="Disabled" Padding="0,0,12,4">
                 <StackPanel Spacing="12">
                     <ScrollViewer Margin="-2,0" HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Hidden"

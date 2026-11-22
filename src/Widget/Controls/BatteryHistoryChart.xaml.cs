@@ -18,7 +18,9 @@ public sealed partial class BatteryHistoryChart : UserControl
     private BatteryChartSeries _series = BatteryChartSeries.Create([], DateTimeOffset.UtcNow, BatteryChartScale.Automatic);
     private BatterySettings _settings = new();
     private DeviceKind _kind;
-    private string? _signature;
+    private IReadOnlyList<BatterySample> _samples = [];
+    private BatteryChartPoint? _hoveredPoint;
+    private readonly Windows.UI.ViewManagement.UISettings _uiSettings = new();
     private int _entranceGeneration;
 
     public BatteryHistoryChart()
@@ -30,11 +32,12 @@ public sealed partial class BatteryHistoryChart : UserControl
 
     public void SetSamples(IReadOnlyList<BatterySample> samples, BatterySettings settings, DeviceKind kind)
     {
-        var signature = string.Join('|', samples.Select(x => $"{x.Time.Ticks}:{x.Percentage}")) + settings.ToJson() + kind;
-        if (signature == _signature) return;
-        _signature = signature;
+        var dataChanged = !ReferenceEquals(samples, _samples);
+        var appearanceChanged = _kind != kind || _settings.AppearanceFor(_kind) != settings.AppearanceFor(kind);
         _settings = settings;
         _kind = kind;
+        if (!dataChanged) { if (appearanceChanged) Draw(); return; }
+        _samples = samples;
         _series = BatteryChartSeries.Create(samples, DateTimeOffset.UtcNow, BatteryChartScale.Automatic);
         var labels = new[] { Axis0, Axis1, Axis2, Axis3 };
         for (var i = 0; i < labels.Length; i++)
@@ -58,6 +61,7 @@ public sealed partial class BatteryHistoryChart : UserControl
     private void OnSizeChanged(object sender, SizeChangedEventArgs args) => Draw();
     private void Draw()
     {
+        HideCrosshair();
         GridLines.Children.Clear();
         var width = Plot.ActualWidth;
         var height = Plot.ActualHeight;
@@ -74,7 +78,7 @@ public sealed partial class BatteryHistoryChart : UserControl
 
     public void PlayEntrance()
     {
-        if (!new Windows.UI.ViewManagement.UISettings().AnimationsEnabled) return;
+        if (!_uiSettings.AnimationsEnabled) return;
         var generation = ++_entranceGeneration;
         var visual = ElementCompositionPreview.GetElementVisual(RevealHost);
         var compositor = visual.Compositor;
@@ -101,6 +105,8 @@ public sealed partial class BatteryHistoryChart : UserControl
         if (width <= 10 || height <= 0) return;
         var point = _series.Nearest((position.X - BatteryChartRenderer.Inset) / (width - BatteryChartRenderer.Inset * 2));
         if (point is null) return;
+        if (ReferenceEquals(point, _hoveredPoint)) return;
+        _hoveredPoint = point;
         var x = BatteryChartRenderer.MapX(point.Position, width);
         var y = BatteryChartRenderer.MapY(point.Percentage, _series, height);
         Cursor.X1 = Cursor.X2 = x;
@@ -116,5 +122,9 @@ public sealed partial class BatteryHistoryChart : UserControl
         Canvas.SetZIndex(Tooltip, 90);
     }
 
-    private void HideCrosshair() => Cursor.Visibility = CursorDot.Visibility = Tooltip.Visibility = Visibility.Collapsed;
+    private void HideCrosshair()
+    {
+        _hoveredPoint = null;
+        Cursor.Visibility = CursorDot.Visibility = Tooltip.Visibility = Visibility.Collapsed;
+    }
 }

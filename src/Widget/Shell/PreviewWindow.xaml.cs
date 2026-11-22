@@ -58,6 +58,12 @@ public sealed partial class PreviewWindow : Window
         }
         await _monitor.RefreshAsync();
         var arguments = Environment.GetCommandLineArgs();
+        var performanceIndex = Array.IndexOf(arguments, "--performance-check");
+        if (_demo && performanceIndex >= 0 && performanceIndex + 1 < arguments.Length)
+        {
+            await Diagnostics.WidgetPerformanceProbe.RunAsync(_preview, arguments[performanceIndex + 1]);
+            OnChanged(this, EventArgs.Empty);
+        }
         if (arguments.Contains("--settings")) OnSettings(this, new RoutedEventArgs());
         var deviceIndex = Array.IndexOf(arguments, "--device");
         if (deviceIndex >= 0 && deviceIndex + 1 < arguments.Length)

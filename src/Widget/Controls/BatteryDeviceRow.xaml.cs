@@ -8,7 +8,8 @@ namespace DeviceBatteryControl.Controls;
 
 public sealed partial class BatteryDeviceRow : UserControl
 {
-    private string? _seriesSignature;
+    private BatteryChartSeries _series = BatteryChartSeries.Create([], DateTimeOffset.UtcNow, BatteryChartScale.Automatic);
+    private ElementTheme _seriesTheme;
     private BatteryDevice? _device;
     private BatterySettings _settings = new();
     private IReadOnlyList<BatterySample> _samples = [];
@@ -23,6 +24,10 @@ public sealed partial class BatteryDeviceRow : UserControl
 
     internal void Update(BatteryDevice device, BatterySettings settings, IReadOnlyList<BatterySample> samples, bool isFirst)
     {
+        var dataChanged = !ReferenceEquals(samples, _samples);
+        var appearanceChanged = _device?.Kind != device.Kind || _settings.AppearanceFor(device.Kind) != settings.AppearanceFor(device.Kind)
+            || _seriesTheme != ActualTheme;
+        if (!dataChanged && !appearanceChanged && _device == device && _settings == settings && _isFirst == isFirst) return;
         _device = device; _settings = settings; _samples = samples; _isFirst = isFirst;
         Divider.Visibility = isFirst ? Visibility.Collapsed : Visibility.Visible;
         NameText.Text = device.Name;
@@ -34,10 +39,9 @@ public sealed partial class BatteryDeviceRow : UserControl
             ? BatteryLoc.Get(device.Percentage <= settings.LowBatteryThreshold ? "LowBattery" : "BatteryLevel")
             : device.Percentage.HasValue ? BatteryLoc.Get("LastKnown") : BatteryLoc.Get("Unavailable");
         AutomationProperties.SetName(this, $"{device.Name}, {PercentageText.Text}, {StateText.Text}");
-        var signature = string.Join('|', samples.Select(x => $"{x.Time.Ticks}:{x.Percentage}")) + settings.ToJson() + ActualTheme;
-        if (_seriesSignature == signature) return;
-        _seriesSignature = signature;
-        var series = BatteryChartSeries.Create(samples, DateTimeOffset.UtcNow, BatteryChartScale.Automatic);
-        BatteryChartRenderer.Draw(SparkHost, series, BatteryAppearance.ColorFor(device.Kind, settings, ActualTheme), false, false);
+        if (dataChanged) _series = BatteryChartSeries.Create(samples, DateTimeOffset.UtcNow, BatteryChartScale.Automatic).ForDisplay(160);
+        if (!dataChanged && !appearanceChanged) return;
+        _seriesTheme = ActualTheme;
+        BatteryChartRenderer.Draw(SparkHost, _series, BatteryAppearance.ColorFor(device.Kind, settings, ActualTheme), false, false);
     }
 }
