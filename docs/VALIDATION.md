@@ -1,5 +1,34 @@
 # Validation
 
+## Version 0.4.0
+
+Checked on Windows 11 x64 on 22 November 2026.
+
+- Passed 44 C# tests and 13 comparisons against Stock Watcher controls/layout.
+- A cold disk reload retained samples from 45 days ago and the saved device name.
+  JSON writes replace the history file atomically after serialization completes.
+- History keeps at most 8,640 real samples per device without a 24-hour cutoff.
+  Chart drawing stays within 1,024 real points, preserving extrema and gaps;
+  hover lookup still uses the full set of saved samples.
+- Automatic refresh is fixed at 15 minutes. Legacy refresh/scale preferences
+  no longer appear in the settings schema or the UI.
+- Tested automatic and explicit selections up to ten devices, selection
+  normalization, empty selections, receiver-only and disconnected cases,
+  default hiding and the opt-in empty-state display.
+- Taskbar visibility uses the SDK's IsPreviewVisible and RequestPreviewRefresh
+  signals, as Media does. A five-second grace period handles brief connection
+  loss and an open flyout holds the widget visible. Discovery remains active
+  while an empty taskbar instance is hidden, allowing it to reappear.
+- Removed the history description and chart-scale/refresh controls. The footer
+  is inside the settings scroll content and contains the widget name and GitHub.
+- Both locales have the same 123 resource keys; all referenced keys resolve.
+- Release compilation passed with no warnings or errors.
+
+The Windows UI controller still fails before initialization, so interaction and
+visual checks through automation remain unavailable.
+
+## Previous baseline
+
 Version 0.3.0, checked on Windows 11 x64 on 22 November 2026.
 
 - Built all 117 upstream protocol translation units with MSVC.

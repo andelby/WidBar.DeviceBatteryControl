@@ -14,9 +14,9 @@ public sealed class BatteryChartSeries
         Points = points; Minimum = minimum; Maximum = maximum;
     }
 
-    public static BatteryChartSeries Create(IEnumerable<BatterySample> samples, DateTimeOffset now, BatteryChartScale scale, int refreshSeconds = 120)
+    public static BatteryChartSeries Create(IEnumerable<BatterySample> samples, DateTimeOffset now, BatteryChartScale scale, int refreshSeconds = BatterySettings.RefreshSeconds)
     {
-        var valid = samples.Where(x => x.Time >= now.AddHours(-24) && x.Time <= now && x.Percentage is >= 0 and <= 100)
+        var valid = samples.Where(x => x.Time <= now && x.Percentage is >= 0 and <= 100)
             .OrderBy(x => x.Time).GroupBy(x => x.Time).Select(x => x.Last()).TakeLast(BatteryHistory.MaximumSamples).ToArray();
         if (valid.Length == 0) return new([], 0, 100);
         var duration = (valid[^1].Time - valid[0].Time).TotalSeconds;
@@ -36,4 +36,33 @@ public sealed class BatteryChartSeries
 
     public BatteryChartPoint? Nearest(double position) => Points.Count == 0 ? null
         : Points.MinBy(x => Math.Abs(x.Position - Math.Clamp(position, 0, 1)));
+
+    public IReadOnlyList<BatteryChartPoint> DisplayPoints(int limit = 1024)
+    {
+        limit = Math.Max(4, limit);
+        if (Points.Count <= limit) return Points;
+        var indices = new SortedSet<int> { 0, Points.Count - 1 };
+        var bucketSize = (int)Math.Ceiling((Points.Count - 2d) / ((limit - 2) / 2));
+        for (var start = 1; start < Points.Count - 1; start += bucketSize)
+        {
+            var minimum = start;
+            var maximum = start;
+            for (var i = start + 1; i < Math.Min(start + bucketSize, Points.Count - 1); i++)
+            {
+                if (Points[i].Percentage < Points[minimum].Percentage) minimum = i;
+                if (Points[i].Percentage > Points[maximum].Percentage) maximum = i;
+            }
+            indices.Add(minimum); indices.Add(maximum);
+        }
+        var display = new List<BatteryChartPoint>(indices.Count);
+        var previous = -1;
+        foreach (var index in indices)
+        {
+            var gap = previous < 0;
+            for (var i = previous + 1; i <= index; i++) gap |= Points[i].StartsSegment;
+            display.Add(Points[index] with { StartsSegment = gap });
+            previous = index;
+        }
+        return display;
+    }
 }

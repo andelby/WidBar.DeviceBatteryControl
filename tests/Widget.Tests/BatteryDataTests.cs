@@ -42,12 +42,12 @@ public sealed class BatteryDataTests
     }
 
     [Fact]
-    public void HistoryStaysBoundedAndExpires()
+    public void HistoryStaysBoundedWithoutExpiringAfterTwentyFourHours()
     {
         var history = new BatteryHistory();
-        for (var i = 0; i < 400; i++) history.Add(Device(i % 100), Now.AddMinutes(i));
+        for (var i = 0; i < BatteryHistory.MaximumSamples + 10; i++) history.Add(Device(i % 100), Now.AddMinutes(i));
         Assert.Equal(BatteryHistory.MaximumSamples, history.Devices["one"].Count);
-        Assert.Empty(history.Get("one", Now.AddDays(2)));
+        Assert.NotEmpty(history.Get("one", Now.AddDays(10)));
         for (var i = 0; i < 40; i++) history.Add(Device(50) with { Id = "device-" + i }, Now.AddDays(2));
         Assert.Equal(BatteryHistory.MaximumDevices, history.Devices.Count);
     }
@@ -57,8 +57,8 @@ public sealed class BatteryDataTests
     {
         Assert.Equal(new BatterySettings(), BatterySettings.FromJson("broken"));
         var settings = BatterySettings.FromJson("""{"PreviewDeviceCount":99,"RefreshSeconds":0,"LowBatteryThreshold":255}""");
-        Assert.Equal(3, settings.PreviewDeviceCount);
-        Assert.Equal(60, settings.RefreshSeconds);
+        Assert.Equal(10, settings.PreviewDeviceCount);
+        Assert.Equal(900, BatterySettings.RefreshSeconds);
         Assert.Equal(50, settings.LowBatteryThreshold);
         Assert.Equal(settings, BatterySettings.FromJson(settings.ToJson()));
     }
@@ -69,7 +69,7 @@ public sealed class BatteryDataTests
         var history = new BatteryHistory();
         history.Devices["one"] = [new(Now.AddDays(-2), 60), new(Now.AddHours(1), 50), new(Now, 255), new(Now, 42)];
         history.Normalize(Now);
-        Assert.Equal(new BatterySample(Now, 42), Assert.Single(history.Devices["one"]));
+        Assert.Equal(new[] { new BatterySample(Now.AddDays(-2), 60), new BatterySample(Now, 42) }, history.Devices["one"]);
     }
 
     [Fact]

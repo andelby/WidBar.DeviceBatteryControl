@@ -24,7 +24,7 @@ internal static class BatteryChartRenderer
         canvas.Clip = new RectangleGeometry { Rect = new Rect(0, 0, width, height) };
         var brush = new SolidColorBrush(color);
         var segments = new List<List<Point>>();
-        foreach (var sample in series.Points)
+        foreach (var sample in series.DisplayPoints())
         {
             if (sample.StartsSegment) segments.Add([]);
             segments[^1].Add(new(MapX(sample.Position, width), MapY(sample.Percentage, series, height)));

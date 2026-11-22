@@ -48,9 +48,9 @@ public sealed partial class PreviewWindow : Window
             var provider = new DemoBatteryProvider();
             var devices = await provider.ReadAsync(CancellationToken.None);
             foreach (var device in devices.Where(x => x.IsConnected && x.Percentage.HasValue))
-                for (var i = 0; i < 144; i++)
-                    _monitor.History.Add(device with { Percentage = Math.Min(100, device.Percentage!.Value + (143 - i) / 6) },
-                        DateTimeOffset.UtcNow.AddMinutes(-1440 + i * 10));
+                for (var i = 0; i < 672; i++)
+                    _monitor.History.Add(device with { Percentage = Math.Min(100, device.Percentage!.Value + (671 - i) / 96) },
+                        DateTimeOffset.UtcNow.AddMinutes(-10080 + i * 15));
         }
         await _monitor.RefreshAsync();
         var arguments = Environment.GetCommandLineArgs();
@@ -69,7 +69,11 @@ public sealed partial class PreviewWindow : Window
             }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
         }
     }
-    private void OnChanged(object? sender, EventArgs args) => _preview.Render(_monitor.Devices, _settings);
+    private void OnChanged(object? sender, EventArgs args)
+    {
+        _preview.Width = _settings.GetPreviewWidth(_monitor.Devices);
+        _preview.Render(_monitor.Devices, _settings);
+    }
     private void OnThemeChanged(object sender, SelectionChangedEventArgs args)
     {
         if (Root is not null) Root.RequestedTheme = ThemePicker.SelectedIndex switch { 1 => ElementTheme.Light, 2 => ElementTheme.Dark, _ => ElementTheme.Default };
@@ -91,7 +95,7 @@ public sealed partial class PreviewWindow : Window
         public void SaveSettings(string json)
         {
             owner._settings = BatterySettings.FromJson(json);
-            owner._preview.Width = owner._settings.PreviewWidth;
+            owner._preview.Width = owner._settings.GetPreviewWidth(owner._monitor.Devices);
             owner._flyout.SetSettings(owner._settings);
             owner._monitor.UpdateClient(owner, owner._settings, true);
             owner._preview.Render(owner._monitor.Devices, owner._settings);

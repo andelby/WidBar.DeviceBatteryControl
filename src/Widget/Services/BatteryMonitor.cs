@@ -6,7 +6,7 @@ using DeviceBatteryControl.Models;
 namespace DeviceBatteryControl.Services;
 
 /// <summary>One provider, history and refresh gate for every widget in the process.
-/// Subscribers own visibility/cadence; no polling when every surface is hidden.</summary>
+/// Registered taskbar widgets keep discovery active while their empty preview is hidden.</summary>
 public sealed class BatteryMonitor : IAsyncDisposable
 {
     private static BatteryMonitor? _shared;
@@ -16,8 +16,7 @@ public sealed class BatteryMonitor : IAsyncDisposable
     private readonly DispatcherQueueTimer _debounce;
     private readonly CancellationTokenSource _lifetime = new();
     private readonly Dictionary<object, (bool Active, BatterySettings Settings)> _clients = [];
-    private readonly string _historyPath;
-    private DateTimeOffset _lastSaved;
+    private readonly BatteryHistoryStore _store;
     private bool _dirty;
     private bool _disposed;
     private Task? _refresh;
@@ -43,8 +42,9 @@ public sealed class BatteryMonitor : IAsyncDisposable
     {
         _provider = provider;
         _dispatcher = DispatcherQueue.GetForCurrentThread();
-        _historyPath = Path.Combine(directory, "battery-history.json");
+        _store = new(directory);
         _timer = _dispatcher.CreateTimer();
+        _timer.Interval = TimeSpan.FromSeconds(BatterySettings.RefreshSeconds);
         _timer.Tick += OnTimer;
         _debounce = _dispatcher.CreateTimer();
         _debounce.Interval = TimeSpan.FromSeconds(1);
@@ -59,11 +59,7 @@ public sealed class BatteryMonitor : IAsyncDisposable
     {
         try
         {
-            if (!File.Exists(_historyPath) || new FileInfo(_historyPath).Length > 2_000_000) return;
-            await using var stream = File.OpenRead(_historyPath);
-            History = await JsonSerializer.DeserializeAsync<BatteryHistory>(stream) ?? new();
-            History.Normalize(DateTimeOffset.UtcNow);
-            _dirty = true;
+            History = await _store.LoadAsync(DateTimeOffset.UtcNow);
         }
         catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException or ArgumentException)
         { Trace.WriteLine($"Battery history: {ex.Message}"); History = new(); }
@@ -74,14 +70,12 @@ public sealed class BatteryMonitor : IAsyncDisposable
         var wasActive = _clients.Values.Any(x => x.Active);
         _clients[client] = (active, settings);
         var activeClients = _clients.Values.Where(x => x.Active).ToArray();
-        _timer.Stop();
         if (activeClients.Length > 0)
         {
-            _timer.Interval = TimeSpan.FromSeconds(activeClients.Min(x => x.Settings.RefreshSeconds));
-            _timer.Start();
+            if (!_timer.IsRunning) _timer.Start();
             if (!wasActive && LastRefresh is not null) _ = RefreshAsync();
         }
-        else _debounce.Stop();
+        else { _timer.Stop(); _debounce.Stop(); }
     }
 
     private void OnDevicesChanged(object? sender, EventArgs args) => _dispatcher.TryEnqueue(() =>
@@ -108,13 +102,14 @@ public sealed class BatteryMonitor : IAsyncDisposable
             var now = DateTimeOffset.UtcNow;
             if (_provider is ConnectedBatteryProvider connected) _dirty |= History.Remap(connected.IdentityAliases);
             Devices = History.WithLastKnown(readings, now);
+            _dirty |= History.Remember(Devices, now);
             if (_clients.Values.Any(x => x.Settings.KeepHistory))
                 foreach (var device in Devices.Where(x => x.LastReading is not null && (LastRefresh is null || x.LastReading > LastRefresh)))
                     _dirty |= History.Add(device, device.LastReading!.Value);
             LastRefresh = now;
             Error = (_provider as ConnectedBatteryProvider)?.WarningKey;
             RefreshCount++;
-            if (_dirty && now - _lastSaved >= TimeSpan.FromMinutes(5)) await SaveHistoryAsync();
+            if (_dirty) await SaveHistoryAsync();
         }
         catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
         catch (Exception ex)
@@ -134,19 +129,15 @@ public sealed class BatteryMonitor : IAsyncDisposable
     {
         if (!_dirty) return _save;
         History.Normalize(DateTimeOffset.UtcNow);
-        var json = JsonSerializer.Serialize(History);
         _dirty = false;
-        _lastSaved = DateTimeOffset.UtcNow;
-        return _save = SaveCoreAsync(json);
+        return _save = SaveCoreAsync();
     }
 
-    private async Task SaveCoreAsync(string json)
+    private async Task SaveCoreAsync()
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(_historyPath)!);
-            await File.WriteAllTextAsync(_historyPath + ".tmp", json);
-            File.Move(_historyPath + ".tmp", _historyPath, true);
+            await _store.SaveAsync(History);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         { _dirty = true; Trace.WriteLine($"Battery history save: {ex.Message}"); }

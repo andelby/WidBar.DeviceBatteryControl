@@ -37,7 +37,7 @@ public sealed partial class BatteryDeviceRow : UserControl
         var signature = string.Join('|', samples.Select(x => $"{x.Time.Ticks}:{x.Percentage}")) + settings.ToJson() + ActualTheme;
         if (_seriesSignature == signature) return;
         _seriesSignature = signature;
-        var series = BatteryChartSeries.Create(samples, DateTimeOffset.UtcNow, settings.ChartScale, settings.RefreshSeconds);
+        var series = BatteryChartSeries.Create(samples, DateTimeOffset.UtcNow, BatteryChartScale.Automatic);
         BatteryChartRenderer.Draw(SparkHost, series, BatteryAppearance.ColorFor(device.Kind, settings, ActualTheme), false, false);
     }
 }

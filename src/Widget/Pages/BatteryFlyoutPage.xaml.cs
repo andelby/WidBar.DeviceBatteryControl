@@ -40,7 +40,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         EmptyTitle.Text = BatteryLoc.Get("NoDevices");
         EmptyHint.Text = BatteryLoc.Get("EmptyHint");
         HistoryHeading.Text = BatteryLoc.Get("History");
-        HistoryRange.Text = BatteryLoc.Get("Last24Hours");
+        HistoryRange.Text = "";
         DetailsHeading.Text = BatteryLoc.Get("Details");
         BluetoothSettings.Content = BatteryLoc.Get("OpenBluetooth");
         SupportHint.Text = BatteryLoc.Get("SupportHint");
@@ -166,6 +166,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
             : BatteryLoc.Format("UpdatedAt", device.LastReading.Value.ToLocalTime().ToString("g", BatteryLoc.FormattingCulture));
         HistorySection.Visibility = _settings.KeepHistory && !device.IsReceiverOnly ? Visibility.Visible : Visibility.Collapsed;
         var samples = _monitor.History.Get(device.Id, DateTimeOffset.UtcNow);
+        HistoryRange.Text = BatteryLoc.Format("SampleCount", samples.Count);
         HistoryChart.SetSamples(samples, _settings, device.Kind);
         HistoryHint.Text = BatteryLoc.Get(samples.Count == 1 ? "HistorySingle" : samples.Count == 0 ? "HistoryEmpty" : "HistoryHint");
         var stats = new List<BatteryStatRow>

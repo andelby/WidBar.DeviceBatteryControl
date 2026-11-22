@@ -8,14 +8,13 @@ using DeviceBatteryControl.Services;
 
 namespace DeviceBatteryControl.Pages;
 
-public sealed record DeviceChoice(string? Id, string Name);
+public sealed record DeviceChoice(string Id, string Name, string Glyph);
 
 public sealed partial class BatterySettingsPage : UserControl
 {
     private readonly IWidgetSettingsContext _context;
     private readonly BatteryMonitor _monitor;
     private readonly BatteryPreviewView _sample = new();
-    private readonly int[] _intervals = [60, 120, 300, 900];
     private BatterySettings _current;
     private bool _ready;
     private bool _listening;
@@ -32,19 +31,19 @@ public sealed partial class BatterySettingsPage : UserControl
         AppearanceSectionText.Text = BatteryLoc.Get("AppearanceSection");
         DataSectionText.Text = BatteryLoc.Get("DataSection");
         CountCard.Header = BatteryLoc.Get("PreviewCount");
-        PreviewCount.ItemsSource = Enumerable.Range(1, 3).Select(x => BatteryLoc.Format("DeviceCount", x)).ToArray();
+        PreviewCount.ItemsSource = Enumerable.Range(1, 10).Select(x => BatteryLoc.Format("DeviceCount", x)).ToArray();
         PreviewCount.SelectedIndex = _current.PreviewDeviceCount - 1;
-        PinnedCard.Header = BatteryLoc.Get("PinnedDevice");
+        DevicesCard.Header = BatteryLoc.Get("TaskbarDevices");
+        AutomaticCard.Header = BatteryLoc.Get("AutomaticSelection");
+        AutomaticToggle.IsOn = _current.SelectedDeviceIds is null;
+        EmptyCard.Header = BatteryLoc.Get("ShowWhenEmpty");
+        EmptyToggle.IsOn = _current.ShowWhenEmpty;
         UpdateDevices();
-        RefreshCard.Header = BatteryLoc.Get("RefreshInterval");
-        RefreshInterval.ItemsSource = _intervals.Select(x => BatteryLoc.Format("Minutes", x / 60)).ToArray();
-        RefreshInterval.SelectedIndex = Math.Max(0, Array.IndexOf(_intervals, _current.RefreshSeconds));
         ThresholdCard.Header = BatteryLoc.Get("LowThreshold");
         Threshold.Value = _current.LowBatteryThreshold;
         DisconnectedCard.Header = BatteryLoc.Get("ShowDisconnected");
         DisconnectedToggle.IsOn = _current.ShowDisconnected;
         HistoryCard.Header = BatteryLoc.Get("KeepHistory");
-        HistoryCard.Description = BatteryLoc.Get("HistoryDescription");
         HistoryToggle.IsOn = _current.KeepHistory;
         IconsCard.Header = BatteryLoc.Get("ShowPreviewIcons");
         IconsToggle.IsOn = _current.ShowIcons;
@@ -56,23 +55,17 @@ public sealed partial class BatterySettingsPage : UserControl
         HighlightCard.Header = BatteryLoc.Get("HighlightLowBattery");
         HighlightCard.Description = BatteryLoc.Get("HighlightDescription");
         HighlightToggle.IsOn = _current.HighlightLowBattery;
-        ChartScaleCard.Header = BatteryLoc.Get("ChartScale");
-        ChartScaleCard.Description = BatteryLoc.Get("ChartScaleDescription");
-        ChartScalePicker.ItemsSource = new[] { BatteryLoc.Get("ScaleAutomatic"), BatteryLoc.Get("ScaleFull") };
-        ChartScalePicker.SelectedIndex = (int)_current.ChartScale;
         MouseEditor.Configure(DeviceKind.Mouse, _current.MouseAppearance);
         KeyboardEditor.Configure(DeviceKind.Keyboard, _current.KeyboardAppearance);
         HeadphonesEditor.Configure(DeviceKind.Headphones, _current.HeadphonesAppearance);
         MouseEditor.Changed += OnAppearanceChanged;
         KeyboardEditor.Changed += OnAppearanceChanged;
         HeadphonesEditor.Changed += OnAppearanceChanged;
-        ForkCredit.Text = BatteryLoc.Get("ForkCredit");
-        ProjectLink.Content = BatteryLoc.Get("ProjectSource");
-        UpstreamLink.Content = BatteryLoc.Get("UpstreamProject");
         SampleHost.Content = _sample;
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
         _ready = true;
+        UpdateSelectionState();
         RenderSample();
     }
 
@@ -93,20 +86,56 @@ public sealed partial class BatterySettingsPage : UserControl
     private void OnNumberChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => SaveDraft();
     private void OnToggled(object sender, RoutedEventArgs args) => SaveDraft();
     private void OnAppearanceChanged(object? sender, EventArgs args) => SaveDraft();
+    private void OnAutomaticToggled(object sender, RoutedEventArgs args)
+    {
+        if (!_ready) return;
+        if (!AutomaticToggle.IsOn && DevicePicker.SelectedItems.Count == 0)
+        {
+            _ready = false;
+            var ids = BatterySelection.Preview(_monitor.Devices, _current).Select(x => DeviceIdentity.Normalize(x.Id)).ToHashSet();
+            foreach (var item in DevicePicker.Items.OfType<DeviceChoice>().Where(x => ids.Contains(DeviceIdentity.Normalize(x.Id))))
+                DevicePicker.SelectedItems.Add(item);
+            _ready = true;
+        }
+        SaveDraft();
+        UpdateSelectionState();
+    }
+
+    private void OnDeviceSelectionChanged(object sender, SelectionChangedEventArgs args)
+    {
+        if (!_ready) return;
+        _ready = false;
+        foreach (var item in args.AddedItems)
+            if (DevicePicker.SelectedItems.Count > 10) DevicePicker.SelectedItems.Remove(item);
+        _ready = true;
+        SaveDraft();
+        UpdateSelectionState();
+    }
+
+    private void UpdateSelectionState()
+    {
+        DevicePicker.IsEnabled = !AutomaticToggle.IsOn;
+        CountCard.IsEnabled = AutomaticToggle.IsOn;
+        SelectionCount.Text = AutomaticToggle.IsOn ? BatteryLoc.Get("Automatic") : BatteryLoc.Format("SelectedCount", DevicePicker.SelectedItems.Count);
+    }
 
     private void UpdateDevices()
     {
-        var signature = string.Join('|', _monitor.Devices.Select(x => x.Id + x.Name)) + _current.PinnedDeviceId;
-        if (_deviceSignature == signature && PinnedDevice.ItemsSource is not null) return;
+        var known = _monitor.History.KnownDevices.Select(x => new BatteryDevice(x.Key, x.Value.Name, x.Value.Kind, false, null, BatterySource.Windows, null));
+        var choices = known.Concat(_monitor.Devices.Where(x => !x.IsReceiverOnly))
+            .GroupBy(x => DeviceIdentity.Normalize(x.Id)).Select(x => x.Last())
+            .Select(x => new DeviceChoice(x.Id, x.Name, DeviceIcons.Glyph(x, _current))).ToList();
+        foreach (var id in _current.SelectedDeviceIds ?? [])
+            if (choices.All(x => DeviceIdentity.Normalize(x.Id) != id)) choices.Add(new(id, BatteryLoc.Get("SavedDevice"), "\uE975"));
+        choices = choices.OrderBy(x => x.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
+        var signature = string.Join('|', choices.Select(x => x.Id + x.Name + x.Glyph));
+        if (_deviceSignature == signature && DevicePicker.ItemsSource is not null) return;
         _deviceSignature = signature;
         var wasReady = _ready;
         _ready = false;
-        var choices = new List<DeviceChoice> { new(null, BatteryLoc.Get("Automatic")) };
-        choices.AddRange(_monitor.Devices.Select(x => new DeviceChoice(x.Id, x.Name)));
-        if (_current.PinnedDeviceId is not null && choices.All(x => x.Id != _current.PinnedDeviceId))
-            choices.Add(new(_current.PinnedDeviceId, BatteryLoc.Get("SavedDevice")));
-        PinnedDevice.ItemsSource = choices;
-        PinnedDevice.SelectedItem = choices.FirstOrDefault(x => x.Id == _current.PinnedDeviceId) ?? choices[0];
+        DevicePicker.ItemsSource = choices;
+        foreach (var choice in choices.Where(x => _current.SelectedDeviceIds?.Contains(DeviceIdentity.Normalize(x.Id)) == true))
+            DevicePicker.SelectedItems.Add(choice);
         _ready = wasReady;
     }
 
@@ -118,10 +147,10 @@ public sealed partial class BatterySettingsPage : UserControl
             new("sample-keyboard", BatteryLoc.Get("DeviceKeyboard"), DeviceKind.Keyboard, true, 92, BatterySource.Windows, null),
             new("sample-headphones", BatteryLoc.Get("DeviceHeadphones"), DeviceKind.Headphones, true, 18, BatterySource.Windows, null)
         ];
-        _sample.Width = _current.PreviewWidth;
+        _sample.Width = _current.GetPreviewWidth(live ? _monitor.Devices : examples);
         _sample.Render(live ? _monitor.Devices : examples, _current);
         LivePreviewNote.Text = BatteryLoc.Get(live ? "SettingsDescription" : "PreviewSampleNote");
-        PreviewWidthText.Text = BatteryLoc.Format("PreviewWidth", _current.PreviewWidth);
+        PreviewWidthText.Text = BatteryLoc.Format("PreviewWidth", (int)_sample.Width);
     }
 
     private void SaveDraft()
@@ -130,8 +159,8 @@ public sealed partial class BatterySettingsPage : UserControl
         _current = BatterySettings.FromJson((_current with
         {
             PreviewDeviceCount = PreviewCount.SelectedIndex + 1,
-            PinnedDeviceId = (PinnedDevice.SelectedItem as DeviceChoice)?.Id,
-            RefreshSeconds = _intervals[Math.Max(0, RefreshInterval.SelectedIndex)],
+            SelectedDeviceIds = AutomaticToggle.IsOn ? null : DevicePicker.SelectedItems.OfType<DeviceChoice>().Select(x => x.Id).ToArray(),
+            ShowWhenEmpty = EmptyToggle.IsOn,
             LowBatteryThreshold = (int)Threshold.Value,
             ShowDisconnected = DisconnectedToggle.IsOn,
             KeepHistory = HistoryToggle.IsOn,
@@ -139,7 +168,6 @@ public sealed partial class BatterySettingsPage : UserControl
             ShowPercentSymbol = PercentToggle.IsOn,
             HighlightLowBattery = HighlightToggle.IsOn,
             LabelMode = (PreviewLabelMode)Math.Max(0, LabelModePicker.SelectedIndex),
-            ChartScale = (BatteryChartScale)Math.Max(0, ChartScalePicker.SelectedIndex),
             MouseAppearance = MouseEditor.Value,
             KeyboardAppearance = KeyboardEditor.Value,
             HeadphonesAppearance = HeadphonesEditor.Value

@@ -28,13 +28,16 @@ follow the existing Weather and Stock Watcher widgets.
 Settings include native icon choices for mouse, keyboard and headphones, system
 or custom colors, device names or short labels, and switches for icons, the
 percent symbol and low-battery highlighting. Changes appear in the live preview.
-The settings footer links to this fork and the original BatteryHub project.
+Choose up to ten devices automatically or select specific registered devices.
+The widget hides from the taskbar when none of the selected devices is connected;
+"Show even without devices" can keep it visible and is off by default.
+The scrolling settings footer shows the widget name and a GitHub link.
 
 The history chart uses the same line, gradient, marker and entrance treatment
 as Stock Watcher. Its horizontal axis covers the real readings available within
-the last 24 hours. A first reading appears in the center; later readings span
+the saved history. A first reading appears in the center; later readings span
 the plot according to their actual timestamps. Missing observations remain gaps.
-The vertical scale can adapt to the readings or stay fixed at 0–100%. Hovering
+The vertical scale adapts to the readings automatically. Hovering
 shows the recorded value and time. The display never invents battery readings.
 
 ## Build
@@ -79,7 +82,9 @@ Connected devices remain visible without a percentage. Previous readings retain
 their timestamp and expire after 30 minutes. Missing values never become zero,
 and stale values do not add chart samples.
 
-Refresh defaults to 120 seconds and stops when all widget surfaces are hidden.
+Automatic refresh runs every 15 minutes. Taskbar instances keep device discovery
+active while hidden so connecting a device can bring the widget back. Hidden
+board-only instances stop polling.
 One monitor is shared by widget instances in the same process. Device changes
 are debounced. Protocol reads run in a hidden child process with a 45-second
 deadline and bounded output; a failed driver cannot block the WinUI thread.
@@ -87,8 +92,14 @@ The process exits after each poll and releases its native sessions. Long-lived
 Bluetooth advertisement/session behavior is not claimed to match the original
 tray app until tested on the corresponding hardware.
 
-Charts share one renderer, redraw when data, appearance, size or theme changes,
-and keep at most 288 observations per device. The entrance runs through Windows
+Each refresh saves new real observations to an atomic JSON file. History survives
+restarts and keeps up to 8,640 observations per device, about 90 days at the regular
+15-minute cadence. It no longer expires after 24 hours. Registered device names
+are saved alongside the samples, including devices currently disconnected.
+
+Charts share one renderer and redraw when data, appearance, size or theme changes.
+Drawing uses at most 1,024 real points while keeping extrema and gaps; the history
+and hover values retain every saved observation. The entrance runs through Windows
 Composition and respects the system animation setting. The native color picker
 is created only when opened; appearance changes do not start device discovery.
 

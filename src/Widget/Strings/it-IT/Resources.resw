@@ -15,11 +15,9 @@
   <data name="LowBattery" xml:space="preserve"><value>Batteria scarica</value></data>
   <data name="LastKnown" xml:space="preserve"><value>Ultima lettura nota</value></data>
   <data name="History" xml:space="preserve"><value>Andamento della batteria</value></data>
-  <data name="Last24Hours" xml:space="preserve"><value>Ultime 24 ore</value></data>
-  <data name="HoursAgo" xml:space="preserve"><value>24 ore fa</value></data>
   <data name="Now" xml:space="preserve"><value>Ora</value></data>
-  <data name="HistoryEmpty" xml:space="preserve"><value>Il grafico apparirà con le prossime letture. Mantieni attivo il widget per costruire lo storico.</value></data>
-  <data name="HistoryHint" xml:space="preserve"><value>Letture reali della batteria. Le interruzioni indicano letture mancanti; ricarica e autonomia residua non vengono stimate.</value></data>
+  <data name="HistoryEmpty" xml:space="preserve"><value>Nessun campione registrato.</value></data>
+  <data name="HistoryHint" xml:space="preserve"><value>Campioni salvati della batteria.</value></data>
   <data name="Details" xml:space="preserve"><value>Dettagli del dispositivo</value></data>
   <data name="Connection" xml:space="preserve"><value>Connessione</value></data>
   <data name="Source" xml:space="preserve"><value>Origine della lettura</value></data>
@@ -42,12 +40,10 @@
   <data name="PinnedDevice" xml:space="preserve"><value>Dispositivo preferito</value></data>
   <data name="Automatic" xml:space="preserve"><value>Automatico · prima la batteria più bassa</value></data>
   <data name="SavedDevice" xml:space="preserve"><value>Dispositivo selezionato in precedenza</value></data>
-  <data name="RefreshInterval" xml:space="preserve"><value>Intervallo di aggiornamento</value></data>
   <data name="Minutes" xml:space="preserve"><value>{0} minuti</value></data>
   <data name="LowThreshold" xml:space="preserve"><value>Soglia batteria scarica (%)</value></data>
   <data name="ShowDisconnected" xml:space="preserve"><value>Mostra dispositivi disconnessi</value></data>
   <data name="KeepHistory" xml:space="preserve"><value>Registra lo storico della batteria</value></data>
-  <data name="HistoryDescription" xml:space="preserve"><value>Le letture restano sul PC per un massimo di 24 ore, con un limite di 288 campioni per dispositivo e 32 dispositivi. Disattivando l’opzione si interrompe la registrazione per questa istanza; lo storico esistente scade dopo 24 ore. Le istanze condividono lo storico.</value></data>
   <data name="On" xml:space="preserve"><value>Attivo</value></data>
   <data name="Off" xml:space="preserve"><value>Disattivo</value></data>
   <data name="SystemTheme" xml:space="preserve"><value>Tema di sistema</value></data>
@@ -96,10 +92,6 @@
   <data name="ShowPercentSymbol" xml:space="preserve"><value>Mostra simbolo percentuale</value></data>
   <data name="HighlightLowBattery" xml:space="preserve"><value>Evidenzia batteria scarica</value></data>
   <data name="HighlightDescription" xml:space="preserve"><value>Usa il colore di avviso di sistema sotto la soglia scelta.</value></data>
-  <data name="ChartScale" xml:space="preserve"><value>Scala del grafico</value></data>
-  <data name="ChartScaleDescription" xml:space="preserve"><value>L’asse temporale segue le letture effettivamente disponibili.</value></data>
-  <data name="ScaleAutomatic" xml:space="preserve"><value>Automatica</value></data>
-  <data name="ScaleFull" xml:space="preserve"><value>Completa (0–100%)</value></data>
   <data name="DeviceMouse" xml:space="preserve"><value>Mouse</value></data>
   <data name="DeviceKeyboard" xml:space="preserve"><value>Tastiera</value></data>
   <data name="DeviceHeadphones" xml:space="preserve"><value>Cuffie</value></data>
@@ -126,9 +118,11 @@
   <data name="IconHeadset" xml:space="preserve"><value>Cuffie con microfono</value></data>
   <data name="IconHeadphoneAlternative" xml:space="preserve"><value>Cuffie (variante)</value></data>
   <data name="IconDefault" xml:space="preserve"><value>Dispositivo predefinito</value></data>
-  <data name="ForkCredit" xml:space="preserve"><value>Device Battery Control è un fork di BatteryHub (Wireless Device Battery Monitor).</value></data>
-  <data name="ProjectSource" xml:space="preserve"><value>Codice sorgente</value></data>
-  <data name="UpstreamProject" xml:space="preserve"><value>Progetto originale</value></data>
   <data name="PreviewSampleNote" xml:space="preserve"><value>Valori di esempio quando nessun dispositivo è collegato.</value></data>
-  <data name="HistorySingle" xml:space="preserve"><value>Prima lettura registrata. I nuovi punti compariranno con le prossime letture.</value></data>
+  <data name="HistorySingle" xml:space="preserve"><value>Un campione registrato.</value></data>
+  <data name="TaskbarDevices" xml:space="preserve"><value>Dispositivi sulla taskbar</value></data>
+  <data name="AutomaticSelection" xml:space="preserve"><value>Selezione automatica</value></data>
+  <data name="ShowWhenEmpty" xml:space="preserve"><value>Mostra anche senza dispositivi</value></data>
+  <data name="SelectedCount" xml:space="preserve"><value>{0}/10 selezionati</value></data>
+  <data name="SampleCount" xml:space="preserve"><value>{0} campioni</value></data>
 </root>

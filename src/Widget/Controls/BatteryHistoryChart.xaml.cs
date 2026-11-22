@@ -35,7 +35,7 @@ public sealed partial class BatteryHistoryChart : UserControl
         _signature = signature;
         _settings = settings;
         _kind = kind;
-        _series = BatteryChartSeries.Create(samples, DateTimeOffset.UtcNow, settings.ChartScale, settings.RefreshSeconds);
+        _series = BatteryChartSeries.Create(samples, DateTimeOffset.UtcNow, BatteryChartScale.Automatic);
         var labels = new[] { Axis0, Axis1, Axis2, Axis3 };
         for (var i = 0; i < labels.Length; i++)
             labels[i].Text = _series.Points.Count == 0 ? "" : (_series.Maximum - _series.Span * i / 3).ToString("0.#", BatteryLoc.FormattingCulture) + "%";

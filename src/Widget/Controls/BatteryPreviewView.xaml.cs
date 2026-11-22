@@ -37,7 +37,7 @@ public sealed partial class BatteryPreviewView : UserControl
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center, TextLineBounds = TextLineBounds.Tight };
             BatteryAppearance.ApplyValue(text, device, settings);
             var label = BatteryAppearance.Label(device, settings);
-            var itemWidth = (settings.PreviewWidth - 20 - Math.Max(0, selected.Count - 1) * 14) / Math.Max(1, selected.Count);
+            var itemWidth = (settings.GetPreviewWidth(devices) - 20 - Math.Max(0, selected.Count - 1) * 14) / Math.Max(1, selected.Count);
             var values = new StackPanel { MaxWidth = Math.Max(20, itemWidth - (settings.ShowIcons ? 26 : 0)), VerticalAlignment = VerticalAlignment.Center };
             text.TextTrimming = TextTrimming.CharacterEllipsis;
             text.MaxLines = 1;

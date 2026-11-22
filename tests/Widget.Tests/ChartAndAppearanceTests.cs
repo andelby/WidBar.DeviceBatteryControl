@@ -31,7 +31,7 @@ public sealed class ChartAndAppearanceTests
     [Fact]
     public void TimeSpacingKeepsRealIntervalsAndBreaksAcrossMissingObservations()
     {
-        var series = BatteryChartSeries.Create([new(Now.AddMinutes(-30), 80), new(Now.AddMinutes(-25), 79), new(Now, 75)], Now, BatteryChartScale.Full);
+        var series = BatteryChartSeries.Create([new(Now.AddMinutes(-30), 80), new(Now.AddMinutes(-25), 79), new(Now, 75)], Now, BatteryChartScale.Full, 120);
         Assert.Equal(1d / 6, series.Points[1].Position, 8);
         Assert.False(series.Points[1].StartsSegment);
         Assert.True(series.Points[2].StartsSegment);
@@ -46,10 +46,11 @@ public sealed class ChartAndAppearanceTests
             new(Now, 80), new(Now.AddMinutes(-5), 82), new(Now, 79),
             new(Now.AddDays(-2), 90), new(Now.AddMinutes(1), 70), new(Now.AddMinutes(-1), 255)
         ], Now, BatteryChartScale.Automatic);
-        Assert.Equal(2, series.Points.Count);
-        Assert.Equal(82, series.Points[0].Percentage);
-        Assert.Equal(79, series.Points[1].Percentage);
-        Assert.Equal(Now, series.Nearest(0.9)!.Time);
+        Assert.Equal(3, series.Points.Count);
+        Assert.Equal(90, series.Points[0].Percentage);
+        Assert.Equal(82, series.Points[1].Percentage);
+        Assert.Equal(79, series.Points[2].Percentage);
+        Assert.Equal(Now, series.Nearest(1)!.Time);
     }
 
     [Fact]
@@ -120,6 +121,5 @@ public sealed class ChartAndAppearanceTests
         Assert.Equal("Mymouse", settings.MouseAppearance.Label);
         Assert.Equal("KeyboardStandard", settings.KeyboardAppearance.IconId);
         Assert.Equal(PreviewLabelMode.None, settings.LabelMode);
-        Assert.Equal(BatteryChartScale.Automatic, settings.ChartScale);
     }
 }

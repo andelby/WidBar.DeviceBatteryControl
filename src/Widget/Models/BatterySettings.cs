@@ -6,7 +6,9 @@ public sealed record BatterySettings
 {
     public string? PinnedDeviceId { get; init; }
     public int PreviewDeviceCount { get; init; } = 2;
-    public int RefreshSeconds { get; init; } = 120;
+    public const int RefreshSeconds = 900;
+    public string[]? SelectedDeviceIds { get; init; }
+    public bool ShowWhenEmpty { get; init; }
     public int LowBatteryThreshold { get; init; } = 20;
     public bool ShowDisconnected { get; init; } = true;
     public bool KeepHistory { get; init; } = true;
@@ -14,11 +16,16 @@ public sealed record BatterySettings
     public bool ShowPercentSymbol { get; init; } = true;
     public bool HighlightLowBattery { get; init; } = true;
     public PreviewLabelMode LabelMode { get; init; }
-    public BatteryChartScale ChartScale { get; init; }
     public DeviceAppearance MouseAppearance { get; init; } = new() { IconId = "Mouse" };
     public DeviceAppearance KeyboardAppearance { get; init; } = new() { IconId = "KeyboardStandard" };
     public DeviceAppearance HeadphonesAppearance { get; init; } = new() { IconId = "Headphone" };
-    public int PreviewWidth => 24 + (76 + (LabelMode == PreviewLabelMode.None ? 0 : 64) - (ShowIcons ? 0 : 22)) * PreviewDeviceCount;
+    public int PreviewWidth => WidthFor(SelectedDeviceIds?.Length ?? PreviewDeviceCount);
+    public int GetPreviewWidth(IEnumerable<BatteryDevice> devices)
+    {
+        var count = BatterySelection.Preview(devices, this).Count;
+        return count == 0 ? 176 : WidthFor(count);
+    }
+    private int WidthFor(int count) => 24 + (76 + (LabelMode == PreviewLabelMode.None ? 0 : 64) - (ShowIcons ? 0 : 22)) * Math.Clamp(count, 1, 10);
 
     public DeviceAppearance AppearanceFor(DeviceKind kind) => kind switch
     {
@@ -33,11 +40,11 @@ public sealed record BatterySettings
             var settings = JsonSerializer.Deserialize<BatterySettings>(json ?? "{}") ?? new();
             return settings with
             {
-                PreviewDeviceCount = Math.Clamp(settings.PreviewDeviceCount, 1, 3),
-                RefreshSeconds = Math.Clamp(settings.RefreshSeconds, 60, 900),
+                PreviewDeviceCount = Math.Clamp(settings.PreviewDeviceCount, 1, 10),
+                SelectedDeviceIds = settings.SelectedDeviceIds?.Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Select(DeviceIdentity.Normalize).Distinct(StringComparer.OrdinalIgnoreCase).Take(10).ToArray(),
                 LowBatteryThreshold = Math.Clamp(settings.LowBatteryThreshold, 5, 50),
                 LabelMode = Enum.IsDefined(settings.LabelMode) ? settings.LabelMode : PreviewLabelMode.None,
-                ChartScale = Enum.IsDefined(settings.ChartScale) ? settings.ChartScale : BatteryChartScale.Automatic,
                 MouseAppearance = (settings.MouseAppearance ?? new()).Normalize(DeviceKind.Mouse),
                 KeyboardAppearance = (settings.KeyboardAppearance ?? new()).Normalize(DeviceKind.Keyboard),
                 HeadphonesAppearance = (settings.HeadphonesAppearance ?? new()).Normalize(DeviceKind.Headphones)

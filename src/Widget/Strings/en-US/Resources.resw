@@ -15,11 +15,9 @@
   <data name="LowBattery" xml:space="preserve"><value>Low battery</value></data>
   <data name="LastKnown" xml:space="preserve"><value>Last known reading</value></data>
   <data name="History" xml:space="preserve"><value>Battery history</value></data>
-  <data name="Last24Hours" xml:space="preserve"><value>Last 24 hours</value></data>
-  <data name="HoursAgo" xml:space="preserve"><value>24 h ago</value></data>
   <data name="Now" xml:space="preserve"><value>Now</value></data>
-  <data name="HistoryEmpty" xml:space="preserve"><value>The chart appears as readings arrive. Keep the widget active to build a history.</value></data>
-  <data name="HistoryHint" xml:space="preserve"><value>Actual battery readings. Gaps indicate missing observations; charging and remaining time are not inferred.</value></data>
+  <data name="HistoryEmpty" xml:space="preserve"><value>No recorded samples.</value></data>
+  <data name="HistoryHint" xml:space="preserve"><value>Saved battery samples.</value></data>
   <data name="Details" xml:space="preserve"><value>Device details</value></data>
   <data name="Connection" xml:space="preserve"><value>Connection</value></data>
   <data name="Source" xml:space="preserve"><value>Battery source</value></data>
@@ -42,12 +40,10 @@
   <data name="PinnedDevice" xml:space="preserve"><value>Preferred device</value></data>
   <data name="Automatic" xml:space="preserve"><value>Automatic · lowest battery first</value></data>
   <data name="SavedDevice" xml:space="preserve"><value>Previously selected device</value></data>
-  <data name="RefreshInterval" xml:space="preserve"><value>Refresh interval</value></data>
   <data name="Minutes" xml:space="preserve"><value>{0} minute(s)</value></data>
   <data name="LowThreshold" xml:space="preserve"><value>Low battery threshold (%)</value></data>
   <data name="ShowDisconnected" xml:space="preserve"><value>Show disconnected devices</value></data>
   <data name="KeepHistory" xml:space="preserve"><value>Record battery history</value></data>
-  <data name="HistoryDescription" xml:space="preserve"><value>Readings are stored locally for up to 24 hours, with at most 288 samples per device and 32 devices. Disabling this stops new history recording for this instance; existing history expires after 24 hours. Instances share history.</value></data>
   <data name="On" xml:space="preserve"><value>On</value></data>
   <data name="Off" xml:space="preserve"><value>Off</value></data>
   <data name="SystemTheme" xml:space="preserve"><value>System theme</value></data>
@@ -96,10 +92,6 @@
   <data name="ShowPercentSymbol" xml:space="preserve"><value>Show percent symbol</value></data>
   <data name="HighlightLowBattery" xml:space="preserve"><value>Highlight low battery</value></data>
   <data name="HighlightDescription" xml:space="preserve"><value>Use the system warning color below the selected threshold.</value></data>
-  <data name="ChartScale" xml:space="preserve"><value>Chart scale</value></data>
-  <data name="ChartScaleDescription" xml:space="preserve"><value>The time axis follows the actual readings available.</value></data>
-  <data name="ScaleAutomatic" xml:space="preserve"><value>Automatic</value></data>
-  <data name="ScaleFull" xml:space="preserve"><value>Full range (0–100%)</value></data>
   <data name="DeviceMouse" xml:space="preserve"><value>Mouse</value></data>
   <data name="DeviceKeyboard" xml:space="preserve"><value>Keyboard</value></data>
   <data name="DeviceHeadphones" xml:space="preserve"><value>Headphones</value></data>
@@ -126,9 +118,11 @@
   <data name="IconHeadset" xml:space="preserve"><value>Headset</value></data>
   <data name="IconHeadphoneAlternative" xml:space="preserve"><value>Headphones (variant)</value></data>
   <data name="IconDefault" xml:space="preserve"><value>Default device</value></data>
-  <data name="ForkCredit" xml:space="preserve"><value>Device Battery Control is a fork of BatteryHub (Wireless Device Battery Monitor).</value></data>
-  <data name="ProjectSource" xml:space="preserve"><value>Source code</value></data>
-  <data name="UpstreamProject" xml:space="preserve"><value>Original project</value></data>
   <data name="PreviewSampleNote" xml:space="preserve"><value>Sample values are shown while no device is connected.</value></data>
-  <data name="HistorySingle" xml:space="preserve"><value>First reading recorded. More points will appear as fresh readings arrive.</value></data>
+  <data name="HistorySingle" xml:space="preserve"><value>One recorded sample.</value></data>
+  <data name="TaskbarDevices" xml:space="preserve"><value>Taskbar devices</value></data>
+  <data name="AutomaticSelection" xml:space="preserve"><value>Automatic selection</value></data>
+  <data name="ShowWhenEmpty" xml:space="preserve"><value>Show even without devices</value></data>
+  <data name="SelectedCount" xml:space="preserve"><value>{0}/10 selected</value></data>
+  <data name="SampleCount" xml:space="preserve"><value>{0} samples</value></data>
 </root>

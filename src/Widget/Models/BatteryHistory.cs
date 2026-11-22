@@ -1,14 +1,31 @@
 namespace DeviceBatteryControl.Models;
 
 public sealed record BatterySample(DateTimeOffset Time, int Percentage, BatterySource? Source = null, string? Transport = null);
+public sealed record SavedBatteryDevice(string Name, DeviceKind Kind, DateTimeOffset LastSeen);
 
 /// <summary>Bounded, real observations. Gaps and reconnections remain gaps.</summary>
 public sealed class BatteryHistory
 {
     public const int MaximumDevices = 32;
-    public const int MaximumSamples = 288;
+    public const int MaximumSamples = 8_640;
     private static readonly TimeSpan LastKnownAge = TimeSpan.FromMinutes(30);
     public Dictionary<string, List<BatterySample>> Devices { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, SavedBatteryDevice> KnownDevices { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public bool Remember(IEnumerable<BatteryDevice> devices, DateTimeOffset now)
+    {
+        var changed = false;
+        foreach (var device in devices.Where(x => !x.IsReceiverOnly))
+        {
+            if (KnownDevices.TryGetValue(device.Id, out var previous) && previous.Name == device.Name
+                && previous.Kind == device.Kind && (!device.IsConnected || now - previous.LastSeen < TimeSpan.FromMinutes(15))) continue;
+            KnownDevices[device.Id] = new(device.Name, device.Kind, now);
+            changed = true;
+        }
+        foreach (var id in KnownDevices.OrderByDescending(x => x.Value.LastSeen).Skip(MaximumDevices).Select(x => x.Key).ToArray())
+            KnownDevices.Remove(id);
+        return changed;
+    }
 
     public bool Add(BatteryDevice device, DateTimeOffset now)
     {
@@ -19,7 +36,6 @@ public sealed class BatteryHistory
                 Devices.Remove(Devices.MinBy(x => x.Value.LastOrDefault()?.Time ?? DateTimeOffset.MinValue).Key);
             Devices[device.Id] = samples = [];
         }
-        samples.RemoveAll(x => now - x.Time > TimeSpan.FromHours(24));
         var last = samples.LastOrDefault();
         if (last is not null && now <= last.Time) return false;
         if (last is not null && now - last.Time < TimeSpan.FromMinutes(5) && last.Percentage == device.Percentage)
@@ -30,7 +46,7 @@ public sealed class BatteryHistory
     }
 
     public IReadOnlyList<BatterySample> Get(string id, DateTimeOffset now) => Devices.TryGetValue(id, out var samples)
-        ? samples.Where(x => x.Time >= now.AddHours(-24) && x.Time <= now)
+        ? samples.Where(x => x.Time <= now)
             .OrderBy(x => x.Time).GroupBy(x => x.Time).Select(x => x.Last()).ToArray() : [];
 
     public bool Remap(IReadOnlyDictionary<string, string> aliases)
@@ -38,6 +54,11 @@ public sealed class BatteryHistory
         var changed = false;
         foreach (var (oldId, newId) in aliases)
         {
+            if (!oldId.Equals(newId, StringComparison.OrdinalIgnoreCase) && KnownDevices.Remove(oldId, out var known))
+            {
+                KnownDevices.TryAdd(newId, known);
+                changed = true;
+            }
             if (oldId.Equals(newId, StringComparison.OrdinalIgnoreCase) || !Devices.Remove(oldId, out var samples)) continue;
             if (!Devices.TryGetValue(newId, out var existing)) Devices[newId] = samples;
             else Devices[newId] = existing.Concat(samples).Distinct().OrderBy(x => x.Time).TakeLast(MaximumSamples).ToList();
@@ -67,9 +88,12 @@ public sealed class BatteryHistory
         Devices ??= new(StringComparer.OrdinalIgnoreCase);
         Devices = Devices.Where(x => !string.IsNullOrEmpty(x.Key) && x.Value is not null)
             .Select(x => new KeyValuePair<string, List<BatterySample>>(x.Key, x.Value
-                .Where(s => s is not null && s.Percentage is >= 0 and <= 100 && s.Time >= now.AddHours(-24) && s.Time <= now)
+                .Where(s => s is not null && s.Percentage is >= 0 and <= 100 && s.Time <= now)
                 .OrderBy(s => s.Time).GroupBy(s => s.Time).Select(s => s.Last()).TakeLast(MaximumSamples).ToList()))
             .Where(x => x.Value.Count > 0).OrderByDescending(x => x.Value[^1].Time).Take(MaximumDevices)
+            .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+        KnownDevices = (KnownDevices ?? []).Where(x => !string.IsNullOrWhiteSpace(x.Key) && x.Value is not null)
+            .OrderByDescending(x => x.Value.LastSeen).Take(MaximumDevices)
             .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
     }
 }
