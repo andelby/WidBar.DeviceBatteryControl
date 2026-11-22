@@ -361,6 +361,15 @@ int main() {
     ctx = Poll(ultra, { { { 0xB5, 0x03 }, UltraSlots(0, 1) } });
     assert(ctx.out.empty() && ctx.claimed.empty());
 
+    // Link-KM (D029) with a Keychron M6 (slot pid D064) answers the same B5 03 / B3 06 queries.
+    auto linkKm = UltraCollection();
+    linkKm.pid = 0xD029;
+    ctx = Poll(linkKm, { { { 0xB5, 0x03 }, UltraReply(0xB5, 0x03, { { 2, 0x34 }, { 3, 0x34 }, { 4, 0x64 }, { 5, 0xD0 }, { 6, 1 } }) },
+                         { { 0xB3, 0x06 }, UltraReply(0xB3, 0x06, { { 19, 66 } }) } });
+    assert((writes == std::vector<std::vector<BYTE>>{ kUltraAskSlots, kUltraAskBase }));
+    assert(ctx.out.size() == 1 && ctx.out[0].key == L"keychron:D029" && ctx.out[0].name == L"Keychron M6");
+    assert(ctx.out[0].percent == 66 && !ctx.out[0].charging && ctx.out[0].kind == DeviceKind::Mouse);
+
     // Other collections on D028 (e.g. FF0B:0104) are not opened by the Ultra-Link path.
     opens = 0;
     ctx = Poll(UltraCollection(0xFF0B), { { { 0xB5, 0x03 }, UltraSlots(0, 1) } });

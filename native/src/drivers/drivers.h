@@ -73,7 +73,7 @@ void PollSinowealthReceiver(PollContext& ctx);  // Redragon M602-KS receiver (25
 void PollDarkrim(PollContext& ctx);   // DARKRIM SHADOW receiver (3654:6901)
 void PollGlorious(PollContext& ctx);  // also Hitscan
 void PollAula(PollContext& ctx);      // AULA F75 / F87 Pro / F99 / HERO 68 Air keyboards, SC580 mouse (before Kysona)
-void PollEweadn(PollContext& ctx);    // EWEADN S7 / S9 mice (372E:103D receiver, 372E:1027 S9 Ultra cable)
+void PollEweadn(PollContext& ctx);    // EWEADN S7 / S9 mice (receiver 372E:1026/1033/103D/1055, cable 372E:1027/1029/105E/108D)
 void PollAulaMouse(PollContext& ctx); // AULA X9 Ultra on the shared AULA-8K receiver
 void PollAulaHeadset(PollContext& ctx); // AULA A7Pro over its 2.4 GHz receiver
 void PollDareu(PollContext& ctx);     // DAREU EM901X receiver / cable, A84 keyboard, A980 Pro, Sharkoon SGM50W (split feature/input collections)
@@ -100,6 +100,7 @@ void PollSteelSeriesElite(PollContext& ctx);  // SteelSeries Arctis Nova Elite b
 void PollAudeze(PollContext& ctx);        // Audeze Maxwell (VID 3329): PC / Xbox / Maxwell 2 dongles or cable
 void PollEndorfy(PollContext& ctx);       // ENDORFY Viro Wireless dongle (3738:0072), Airoha RACE battery query
 void PollTurtleBeach(PollContext& ctx);   // Turtle Beach Stealth 700 Gen 3 (10F5:2251 / 2262 transmitters, 2253 cable)
+void PollRoccat(PollContext& ctx);        // ROCCAT Syn Max Air headset on its receiver (1E7D:3A3F)
 void PollAkg(PollContext& ctx);           // AKG N9 Hybrid on its USB dongle (0ECB:20D9), Airoha RACE battery query
 void PollNzxt(PollContext& ctx);          // NZXT Lift Elite Wireless (1E71:2101 / 2129)
 void PollPlantronics(PollContext& ctx);   // Poly / Plantronics headsets behind the BT600 adapter (047F)
@@ -150,7 +151,9 @@ void PollAtkBitmouse(PollContext& ctx);  // ATK / VXE NK NANO dongle 373B:1216, 
 void PollChimera(PollContext& ctx);      // Chimera V2 mouse (3554:F512, before Kysona, same vendor id)
 void PollKysona(PollContext& ctx);    // also Pulsar, ATK / VXE, Hitscan Hyperlight
 void PollHyperX(PollContext& ctx);
+void PollLogitechG435Jieli(PollContext& ctx);  // G435 on the Jieli 4C4A:4155 receiver: Bluetooth-calibrated estimate (PR #632)
 void PollLogitechG435(PollContext& ctx);  // G435 headset on the 046D:0ADF dongle (not HID++)
+void PollLogitechG735(PollContext& ctx);  // G735 headset on the 046D:0AD8 dongle (Centurion HID++ in report F2)
 void PollAstro(PollContext& ctx);  // A50 X / Gen 5 vendor protocol (before generic Logitech)
 void PollLogitech(PollContext& ctx);
 void PollRazer(PollContext& ctx);

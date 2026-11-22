@@ -18,6 +18,15 @@
 //   On the 1K dongle 5402 two more reads come from PR #164 (Pulsar Fusion2 captures in pulsar-mouse-linux):
 //   08 83 01 -> packet byte 6 = 1 while the mouse is on its charging cable, and 01 84 04 -> bytes 6..9 =
 //   VID / PID (LE) of the paired mouse, used to name it (3710:3401 Xlite v4, 3710:3409 X3).
+//   The 1K dongle has its own exchange (PollOneK below), checked on an Xlite v4, Windows 11:
+//   - 05 is final there: the mouse is asleep and the request is never answered. It is shown as asleep
+//     (last value dimmed) rather than as switched off.
+//   - A request sent while another is pending on 02 is dropped, and resending them can leave every read
+//     relayed to the mouse stuck on 02. So nothing is sent while the dongle shows 02, a pending request
+//     is never re-sent, and one 1 s deadline covers all reads of a poll.
+//   - The dongle is claimed whether or not it answers. Left unclaimed (the first poll after the mouse fell
+//     asleep), kysona.cpp sent it its 17-byte report 08 probe, after which every read stayed on 02 until
+//     the dongle was replugged and the mouse power-cycled.
 // Feinmann FO1 8K (`3710:5404`, issue #3753) uses the same Sonix feature-report
 // battery query `08 81 01` on interface 3 (FFFF:0001, 65/65/65 bytes).
 // Captured and verified on real hardware in
@@ -146,6 +155,127 @@ const wchar_t* PairedMouseName(USHORT vid, USHORT pid) {
     }
 }
 
+// --- 1K dongle 5402 ---
+
+constexpr USHORT kOneKPid = 0x5402;
+constexpr int kOneKDeadlineMs = 1000;
+constexpr int kOneKPollMs = 10;
+constexpr int kOneKStalePolls = 5;      // polls showing an older answer before the request counts as lost
+constexpr int kOneKStaleResends = 2;    // resends allowed per request
+constexpr int kOneKResendRoomMs = 350;  // no resend this close to the deadline: it would be left pending
+
+enum class Link { Ok, NoLink, NoReply, IoError };
+
+bool Echoes(const std::vector<BYTE>& r, const std::vector<BYTE>& req) {
+    return r.size() >= 5 && req.size() >= 5 && r[2] == req[2] && r[3] == req[3] && r[4] == req[4];
+}
+
+class OneKDongle {
+public:
+    OneKDongle(HidDev& d, ULONGLONG deadline) : d_(d), deadline_(deadline) {}
+
+    // On Link::Ok `w` holds the 64-byte reply packet (without the report id).
+    Link Read(BYTE cat, BYTE reg, BYTE sub, std::vector<BYTE>& w) {
+        std::vector<BYTE> req(65, 0);
+        BYTE* p = req.data() + 1;
+        p[1] = cat;
+        p[2] = reg;
+        p[3] = sub;
+        unsigned sum = 0;
+        for (int i = 0; i < 62; i++) sum += p[i];
+        p[62] = (BYTE)(sum & 0xFF);
+        p[63] = (BYTE)(sum >> 8);
+        std::vector<BYTE> prev = prev_;
+        prev_ = req;
+        std::vector<BYTE> r;
+        // The reply buffer is the dongle's: a request of an earlier poll (or of another program) may still
+        // be pending there. Wait for it rather than send on top of it.
+        if (!idle_) {
+            for (;;) {
+                if (!d_.GetFeature(0x00, r) || r.size() < 65) return Link::IoError;
+                if (r[1] != 0x02) break;
+                if (GetTickCount64() >= deadline_) return Link::NoReply;
+                Sleep(kOneKPollMs);
+            }
+        }
+        idle_ = false;
+        if (!d_.SetFeature(req)) return Link::IoError;
+        int sends = 1, stale = 0;
+        bool shown = false;
+        for (;;) {
+            if (!d_.GetFeature(0x00, r) || r.size() < 65) return Link::IoError;
+            if (Echoes(r, req)) {
+                stale = 0;
+                if (r[1] == 0x01) {
+                    idle_ = true;
+                    w.assign(r.begin() + 1, r.end());
+                    return Link::Ok;
+                }
+                if (r[1] == 0x05) {
+                    idle_ = true;
+                    return Link::NoLink;
+                }
+                shown = true;  // pending: wait, never re-send
+            } else if (r[1] == 0x01 && (shown || Echoes(r, prev))) {
+                // The buffer went back to an older answer: the dongle lost the request.
+                if (++stale >= kOneKStalePolls && sends <= kOneKStaleResends &&
+                    GetTickCount64() + kOneKResendRoomMs < deadline_) {
+                    if (!d_.SetFeature(req)) return Link::IoError;
+                    sends++;
+                    stale = 0;
+                }
+            } else {
+                stale = 0;
+            }
+            if (GetTickCount64() >= deadline_) return Link::NoReply;
+            Sleep(kOneKPollMs);
+        }
+    }
+
+private:
+    HidDev& d_;
+    ULONGLONG deadline_;
+    std::vector<BYTE> prev_;
+    bool idle_ = false;  // the last read ended on a final status, so nothing of ours is pending
+};
+
+void PollOneK(PollContext& ctx) {
+    bool present = false;
+    for (const HidColl& c : ctx.colls) present |= c.vid == kVid && c.pid == kOneKPid;
+    if (!present) return;
+    ctx.Claim(kVid, kOneKPid);  // even when it does not answer: kysona.cpp's probe must never reach it
+    for (const HidColl* c : ctx.Find(kVid, kOneKPid, [](const HidColl& c) {
+             return c.iface == 3 && c.page() == 0xFFFF && c.usage() == 0x0001 && c.featLen() == 65;
+         })) {
+        HidDev d;
+        if (!d.OpenFeatureOnly(*c)) continue;
+        OneKDongle dongle(d, GetTickCount64() + kOneKDeadlineMs);
+        std::vector<BYTE> w;
+        Link bat = dongle.Read(0x08, 0x81, 0x01, w);
+        if (bat == Link::IoError) continue;
+        DeviceStatus s;
+        s.key = L"pulsar:" + Hex4(kOneKPid);
+        s.name = L"Pulsar wireless mouse";
+        s.kind = DeviceKind::Mouse;
+        s.via = L"2.4 GHz receiver";
+        s.graceSec = 1800;
+        if (bat == Link::Ok && w[6] >= 1 && w[6] <= 100) {
+            s.percent = w[6];
+            if (dongle.Read(0x08, 0x83, 0x01, w) == Link::Ok) s.charging = w[6] == 1;
+        } else if (bat == Link::Ok) {
+            s.connected = false;  // 0 or FF: no mouse paired or in range
+        } else {
+            s.asleep = true;  // 05 (asleep) or no answer in time: keep the last value
+        }
+        // Answered by the dongle itself, so it names the mouse while it sleeps too.
+        if (bat != Link::NoReply && dongle.Read(0x01, 0x84, 0x04, w) == Link::Ok)
+            if (const wchar_t* m = PairedMouseName((USHORT)(w[6] | (w[7] << 8)), (USHORT)(w[8] | (w[9] << 8))))
+                s.name = m;
+        ctx.Add(s, kVid, kOneKPid);
+        break;
+    }
+}
+
 }  // namespace
 
 void PollPulsar(PollContext& ctx) {
@@ -156,6 +286,10 @@ void PollPulsar(PollContext& ctx) {
 
     for (const Product& prod : kProducts) {
         if (ctx.IsClaimed(kVid, prod.pid)) continue;
+        if (prod.pid == kOneKPid) {
+            PollOneK(ctx);
+            continue;
+        }
         if (prod.pid == 0x5405 || prod.pid == 0x7401) {
             const bool directMouse = prod.pid == 0x7401;
             bool matchingCollection = false;
@@ -234,13 +368,6 @@ void PollPulsar(PollContext& ctx) {
                 s.name = prod.name ? prod.name : (generic ? L"Pulsar wireless mouse" : n);
                 s.via = L"2.4 GHz receiver";
                 s.connected = rep == Reply::Battery && pct > 0;
-                if (prod.pid == 0x5402 && s.connected) {
-                    std::vector<BYTE> w;
-                    if (Query(d, 0x08, 0x83, 0x01, w) == Reply::Battery) s.charging = w[6] == 1;
-                    if (Query(d, 0x01, 0x84, 0x04, w) == Reply::Battery)
-                        if (const wchar_t* m = PairedMouseName((USHORT)(w[6] | (w[7] << 8)), (USHORT)(w[8] | (w[9] << 8))))
-                            s.name = m;
-                }
             }
             if (rep == Reply::Battery && (pct > 0 || prod.cable)) s.percent = pct;
             ctx.Add(s, kVid, prod.pid);

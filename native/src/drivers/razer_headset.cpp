@@ -8,7 +8,9 @@
 // most once every 5 minutes and the last reading is reused in between.
 // Protocol from OpenRazer PR #2794 (docs/v3_pro_protocol.md) and github.com/ReedME/omarchy-blackshark-v3.
 //
-// BlackShark V2 Pro (2020), 2.4 GHz receiver 1532:0528, uses feature report FF on FF00:0001.
+// BlackShark V2 Pro (2020), receiver 1532:0528, and Barracuda X (2021), receiver 1532:0536,
+// use the same Avnera battery query via 64-byte feature report FF on interface 3, FF00:0001.
+// The Barracuda X reply header, voltage and percentage were confirmed on its 2.4 GHz receiver.
 // Request from https://github.com/openrazer/openrazer/issues/1280#issuecomment-1094116217.
 // Reply and power states documented in https://github.com/HeyOkay/HaloBattery/blob/main/providers/blackshark2020.py.
 //
@@ -212,8 +214,8 @@ void PollBarracudaXChroma(PollContext& ctx) {
     }
 }
 
-void PollBlackSharkV2Pro2020(PollContext& ctx) {
-    constexpr USHORT vid = 0x1532, pid = 0x0528;
+void PollRazerAvneraHeadset(PollContext& ctx, USHORT pid, const wchar_t* name, const wchar_t* key) {
+    constexpr USHORT vid = 0x1532;
     constexpr int reportLen = 64, maxReads = 5;
     constexpr BYTE reply[] = { 0xFF, 0x0F, 0x05, 0xFE, 0x12, 0x04, 0x1F, 0x08, 0x05 };
     constexpr BYTE stale[] = { 0xFF, 0x01, 0x00, 0xFE, 0x12, 0x04, 0x1F, 0x08, 0x05 };
@@ -236,15 +238,15 @@ void PollBlackSharkV2Pro2020(PollContext& ctx) {
             if (!fresh && !offline) continue;
 
             DeviceStatus s;
-            s.key = L"blackshark:" + Hex4(pid);
-            s.name = L"Razer BlackShark V2 Pro (2020)";
+            s.key = key;
+            s.name = name;
             s.kind = DeviceKind::Headset;
             s.via = L"2.4 GHz receiver";
             s.millivolts = fresh ? (r[12] << 8) | r[13] : 0;
             s.connected = s.millivolts != 0;
             if (s.connected) {
                 s.charging = r[11] == 0x09;
-                // The receiver can jump to 80% as soon as charging starts, even from 10%.
+                // A BlackShark receiver can jump to 80% as soon as charging starts, even from 10%.
                 if (!s.charging && r[14] <= 100) s.percent = r[14];
             }
             ctx.Add(s, vid, pid);
@@ -517,7 +519,8 @@ void PollRazerHeadsets(PollContext& ctx) {
     PollBlackSharkV2HyperSpeed(ctx);
     PollBarracudaXChroma(ctx);
     PollBarracudaX(ctx);
-    PollBlackSharkV2Pro2020(ctx);
+    PollRazerAvneraHeadset(ctx, 0x0528, L"Razer BlackShark V2 Pro (2020)", L"blackshark:0528");
+    PollRazerAvneraHeadset(ctx, 0x0536, L"Razer Barracuda X (2021)", L"barracuda:0536");
     PollBlackSharkV2Pro2023(ctx);
     PollBlackSharkV3X(ctx);
     for (USHORT pid : { (USHORT)0x0576, (USHORT)0x0577, (USHORT)0x0579, (USHORT)0x057A, (USHORT)0x0A4E,

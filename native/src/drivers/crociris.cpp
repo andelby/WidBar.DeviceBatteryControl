@@ -10,8 +10,9 @@
 //   cmd 0x12 = GetDeviceStatus, empty payload, read-only
 //   reply payload[0] = charging (1 = yes), payload[1] = battery percent, payload[2] = full,
 //   payload[3] & 0x0F = link mode (1 = the mouse is linked through this receiver)
-// The receiver answers while the mouse is awake; a sleeping mouse stops answering, so its last
-// value is kept, dimmed, until the receiver answers again.
+// While the mouse sleeps the receiver keeps answering, but reports 0 for the level. A powered mouse
+// is never at 0%, so 0 is treated as a missing reading: the last value is kept, dimmed, until a
+// plausible level arrives. (Before this check the taskbar showed 0% for a mouse that still worked.)
 #include "drivers.h"
 
 namespace {
@@ -43,7 +44,10 @@ bool ReadBattery(const HidColl& c, int& percent, bool& charging, bool& full) {
         if (n < 6 || r[0] != kReplyHeader || r[1] != kGetDeviceStatus) continue;
         const int len = r[2];
         if (len < 2 || n < 4 + len) continue;
-        if (r[4] > 1 || r[5] > 100) continue;  // charging flag or level out of range: not our frame
+        // Symptom: the taskbar showed 0% for a mouse that still worked. Cause: while the mouse
+        // sleeps the receiver answers 0 for the level. A mouse in use is never at 0% (it would have
+        // shut down already), so skip that reading and keep the last one, dimmed, instead of 0.
+        if (r[4] > 1 || r[5] == 0 || r[5] > 100) continue;  // charging flag or level not plausible
         charging = r[4] == 1;
         percent = r[5];
         full = len > 2 && r[6] == 1;

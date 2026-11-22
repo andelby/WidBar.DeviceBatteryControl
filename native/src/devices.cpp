@@ -51,7 +51,7 @@ std::vector<DeviceStatus> PollAllDevices(const std::set<std::wstring>* knownDevi
     PollAula(ctx);       // before Kysona (shares the 3554 vendor id) and SONiX (shares 05AC:024F)
     PollAulaMouse(ctx);
     PollAulaHeadset(ctx);
-    PollEweadn(ctx);     // BeiYing mice: EWEADN S7 / S9 on 372E:103D / 1027, RK M3 on 1019 / 102A (AULA keeps 106C)
+    PollEweadn(ctx);     // BeiYing mice: EWEADN S9 on 372E:1026/1033/103D/1055 receivers or 1027/1029/105E/108D cables, RK M3 on 1019 / 102A (AULA keeps 106C)
     PollDareu(ctx);
     PollPiao(ctx);       // IPI PIAO mouse on 372E:1014 receiver (and wired 1015/1028/1056)
     PollZenith(ctx);
@@ -117,6 +117,8 @@ std::vector<DeviceStatus> PollAllDevices(const std::set<std::wstring>* knownDevi
     PollBarracudaPro(ctx);   // before the generic Razer driver as well
     PollHyperX(ctx);
     PollLogitechG435(ctx);  // before the HID++ driver, which shares the vendor id
+    PollLogitechG435Jieli(ctx);
+    PollLogitechG735(ctx);  // likewise
     PollAstro(ctx);
     PollLogitech(ctx);
     PollRazer(ctx);
@@ -125,6 +127,7 @@ std::vector<DeviceStatus> PollAllDevices(const std::set<std::wstring>* knownDevi
     PollAudeze(ctx);
     PollEndorfy(ctx);
     PollTurtleBeach(ctx);
+    PollRoccat(ctx);
     PollAkg(ctx);
     PollNzxt(ctx);
     PollPlantronics(ctx);

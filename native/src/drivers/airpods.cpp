@@ -146,6 +146,10 @@ bool FillDualBudStatus(DeviceStatus& s, int left, bool leftChg, int right, bool 
                L", R " + Pct(right) + (rightChg ? L" \x26A1" : L"") +
                L", case " + Pct(box) + (boxChg ? L" \x26A1" : L"");
     if (suffix && *suffix) s.detail += suffix;
+    // Each part on its own, for the dashboard (PR #3946).
+    if (left >= 0) s.batteries.push_back({ L"Left", left, leftChg, left >= 100 && leftChg });
+    if (right >= 0) s.batteries.push_back({ L"Right", right, rightChg, right >= 100 && rightChg });
+    if (box >= 0) s.batteries.push_back({ L"Case", box, boxChg, box >= 100 && boxChg });
     return true;
 }
 

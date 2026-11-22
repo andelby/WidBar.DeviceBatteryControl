@@ -200,6 +200,50 @@ std::wstring ContainerOf(const std::wstring& path) {
 
 std::wstring HidContainer(const std::wstring& path) { return ContainerOf(path); }
 
+namespace {
+
+// Charging state from the USB HID Battery System page (0x85) in the report that carried the level
+// (PR #632): 0x44 Charging, 0x45 Discharging, 0x46 Fully Charged, 0xD0 AC Present, declared either as
+// buttons or as 1-bit / 8-bit values. Devices without these usages are left as not charging.
+void ReadHidCharge(HIDP_REPORT_TYPE type, PHIDP_PREPARSED_DATA pp, std::vector<BYTE>& report, DeviceStatus& s) {
+    bool charging = false, full = false, ac = false, discharging = false;
+    PCHAR buf = (PCHAR)report.data();
+    ULONG len = (ULONG)report.size();
+    ULONG max = HidP_MaxUsageListLength(type, 0x85, pp);
+    if (max) {
+        std::vector<USAGE> on(max);
+        ULONG count = max;
+        if (HidP_GetUsages(type, 0x85, 0, on.data(), &count, pp, buf, len) == HIDP_STATUS_SUCCESS) {
+            for (ULONG i = 0; i < count; i++) {
+                charging |= on[i] == 0x44;
+                discharging |= on[i] == 0x45;
+                full |= on[i] == 0x46;
+                ac |= on[i] == 0xD0;
+            }
+        }
+    }
+    USHORT n = 0;
+    if (HidP_GetValueCaps(type, nullptr, &n, pp) == HIDP_STATUS_BUFFER_TOO_SMALL && n) {
+        std::vector<HIDP_VALUE_CAPS> vc(n);
+        if (HidP_GetValueCaps(type, vc.data(), &n, pp) == HIDP_STATUS_SUCCESS) {
+            for (const auto& v : vc) {
+                USAGE u = v.IsRange ? v.Range.UsageMin : v.NotRange.Usage;
+                if (v.UsagePage != 0x85 || (u != 0x44 && u != 0x45 && u != 0x46 && u != 0xD0)) continue;
+                ULONG val = 0;
+                if (HidP_GetUsageValue(type, 0x85, v.LinkCollection, u, &val, pp, buf, len) != HIDP_STATUS_SUCCESS || !val) continue;
+                charging |= u == 0x44;
+                discharging |= u == 0x45;
+                full |= u == 0x46;
+                ac |= u == 0xD0;
+            }
+        }
+    }
+    s.full = full;
+    s.charging = charging || full || (ac && !discharging);
+}
+
+}  // namespace
+
 void PollGenericHid(PollContext& ctx) {
     // Drawing tablets and pen displays (any collection on the Digitizers page 0D) are never read:
     // polling one for a battery report flipped the Y axis of an XP-Pen Deco Fun S (issue #232).
@@ -219,6 +263,7 @@ void PollGenericHid(PollContext& ctx) {
         if (!HidD_GetPreparsedData(h, &pp)) { CloseHandle(h); continue; }
 
         int pct = -1;
+        DeviceStatus s;
         for (HIDP_REPORT_TYPE type : { HidP_Feature, HidP_Input }) {
             USHORT n = type == HidP_Feature ? c.caps.NumberFeatureValueCaps : c.caps.NumberInputValueCaps;
             USHORT len = type == HidP_Feature ? c.featLen() : c.inLen();
@@ -242,13 +287,13 @@ void PollGenericHid(PollContext& ctx) {
                 if (percentQuirk) pct = (int)val;
                 else if (v.LogicalMax > v.LogicalMin) pct = Clamp100((int)(((LONG)val - v.LogicalMin) * 100 / (v.LogicalMax - v.LogicalMin)));
                 else if (val <= 100) pct = (int)val;
+                if (pct >= 0) ReadHidCharge(type, pp, buf, s);
             }
             if (pct >= 0) break;
         }
         HidD_FreePreparsedData(pp);
         CloseHandle(h);
         if (pct < 0) continue;
-        DeviceStatus s;
         s.name = HidProduct(c);
         if (s.name.empty()) s.name = L"Wireless device";
         s.key = L"hid:" + Hex4(c.vid) + L":" + Hex4(c.pid);

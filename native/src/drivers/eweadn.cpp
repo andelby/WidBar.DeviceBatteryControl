@@ -1,8 +1,14 @@
 // EWEADN (前行者) S7 / S9 series mice on EWEADN's own vendor id 372E.
-//  * 372E:103D  "Gaming 2.4G" receiver shared by the S7 Max / Pro / Ultra and S9 Max / Pro / Ultra / Ultra+
-//  * 372E:1027  EWEADN S9 Ultra on its USB cable
+//  * 372E:1026  "Gaming 2.4G" receiver shared by the S9 Pro / Ultra / Max / Ultra+
+//  * 372E:1033  the same S9 receiver (S9 Pro / Ultra)
+//  * 372E:103D  the same receiver (S9 Pro / Ultra / Max / Ultra+; also used by S7 Max / Pro / Ultra)
+//  * 372E:1055  the same S9 receiver (S9 Pro / Ultra / Max)
+//  * 372E:1029 / 1027 / 105E / 108D  S9 Pro / Ultra / Max / Ultra+ on their USB cables
+// The receiver ids and cable ids come from the device table in EWEADN's config.xml; all S9 models
+// use the same BeiYing protocol. Hardware-tested on an S9 Pro 8K receiver (372E:1026, firmware v1052):
+// 4F 81 returned 5D (93%).
 // Protocol from EWEADN's official web driver (new-hub.eweadn.cn): the device table in main.*.js lists
-// both ids with solutionRovider "beiying" and hidReportId 3, and the "sdk-mouse-beiying" /
+// these ids with solutionRovider "beiying" and hidReportId 3, and the "sdk-mouse-beiying" /
 // "vendor-bytech" chunks hold the mouse SDK:
 //  * Requests are 64-byte feature reports with report id 3 (usage page FF00, interface 2), read back
 //    with GetFeature about 100 ms later (receiveDelay 100, up to 3 reads).
@@ -31,8 +37,14 @@ struct Model {
     bool rk;         // RK's variant: sequence number 2, reply byte 5 must be 1, "rk:" key
 };
 constexpr Model kModels[] = {
+    { 0x1026, L"EWEADN wireless mouse", L"2.4 GHz receiver", true, false },
+    { 0x1033, L"EWEADN wireless mouse", L"2.4 GHz receiver", true, false },
     { 0x103D, L"EWEADN wireless mouse", L"2.4 GHz receiver", true, false },
+    { 0x1055, L"EWEADN wireless mouse", L"2.4 GHz receiver", true, false },
     { 0x1027, L"EWEADN S9 Ultra", L"USB cable", false, false },
+    { 0x1029, L"EWEADN S9 Pro", L"USB cable", false, false },
+    { 0x105E, L"EWEADN S9 Max", L"USB cable", false, false },
+    { 0x108D, L"EWEADN S9 Ultra+", L"USB cable", false, false },
     { 0x1019, L"RK M3", L"2.4 GHz receiver", false, true },
     { 0x102A, L"RK M3", L"USB cable", false, true },
 };

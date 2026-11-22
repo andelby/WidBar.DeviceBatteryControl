@@ -264,6 +264,9 @@ void PollLegacy(PollContext& ctx) {
 }
 
 constexpr USHORT kUltraLink8k = 0xD028;  // Keychron Ultra-Link 8K receiver
+// Link-KM receivers that pair a mouse (e.g. the M6, slot pid 3434:D064) answer the same "8k" B5/B3
+// queries on FFC1:0001. Checked on a real M6 on a 3434:D029 Link-KM receiver.
+constexpr USHORT kLinkKmMouse = 0xD029;
 constexpr BYTE kUltraReceiverReport = 0xB5;
 constexpr BYTE kUltraMouseReport = 0xB3;
 
@@ -282,34 +285,41 @@ bool UltraQuery(HidDev& d, BYTE id, BYTE cmd, std::vector<BYTE>& r) {
     return false;
 }
 
-// 8K mouse on the Ultra-Link 8K receiver (Launcher protocol "8k" on FFC1:0001).
+// 8K mouse on the Ultra-Link 8K receiver, or a mouse on the Link-KM (D029), via the Launcher protocol "8k" on FFC1:0001.
 void PollUltraLink(PollContext& ctx) {
-    for (const HidColl* c : ctx.Find(0x3434, kUltraLink8k, [](const HidColl& c) { return c.page() == 0xFFC1 && c.usage() == 0x01 && c.outLen() >= 21 && c.inLen() >= 21; })) {
-        HidDev d;
-        if (!d.Open(*c)) continue;
-        std::vector<BYTE> r;
-        // Only ask when a mouse sits in a receiver slot and is connected.
-        if (!UltraQuery(d, kUltraReceiverReport, 0x03, r)) continue;
-        bool connected = false;
-        for (int off : {3, 8, 13}) {  // payload offsets 2/7/12 (+1 for the report id): vid LE16, pid LE16, status
-            // A keyboard in the slot never answers B3 06 (checked on a Q6 Ultra 8K): it is not a mouse to wait for.
-            bool keyboard = UltraKeyboardName((USHORT)(r[off + 2] | (r[off + 3] << 8))) != nullptr;
-            connected = connected || (!keyboard && (r[off] | r[off + 1]) != 0 && r[off + 4] != 0);
+    for (USHORT rpid : {kUltraLink8k, kLinkKmMouse}) {
+        for (const HidColl* c : ctx.Find(0x3434, rpid, [](const HidColl& c) { return c.page() == 0xFFC1 && c.usage() == 0x01 && c.outLen() >= 21 && c.inLen() >= 21; })) {
+            HidDev d;
+            if (!d.Open(*c)) continue;
+            std::vector<BYTE> r;
+            // Only ask when a mouse sits in a receiver slot and is connected.
+            if (!UltraQuery(d, kUltraReceiverReport, 0x03, r)) continue;
+            bool connected = false;
+            USHORT mousePid = 0;
+            for (int off : {3, 8, 13}) {  // payload offsets 2/7/12 (+1 for the report id): vid LE16, pid LE16, status
+                // A keyboard in the slot never answers B3 06 (checked on a Q6 Ultra 8K): it is not a mouse to wait for.
+                USHORT slotPid = (USHORT)(r[off + 2] | (r[off + 3] << 8));
+                bool keyboard = UltraKeyboardName(slotPid) != nullptr;
+                bool here = !keyboard && (r[off] | r[off + 1]) != 0 && r[off + 4] != 0;
+                if (here && !mousePid) mousePid = slotPid;
+                connected = connected || here;
+            }
+            if (!connected) continue;
+            if (!UltraQuery(d, kUltraMouseReport, 0x06, r)) continue;
+            BYTE power = r[20];  // payload byte 19
+            int percent = power & 0x7F;
+            if (percent < 1 || percent > 100) continue;
+            DeviceStatus s;
+            s.key = L"keychron:" + Hex4(rpid);
+            if (rpid == kLinkKmMouse) s.name = mousePid == 0xD064 ? L"Keychron M6" : L"Keychron mouse";
+            else s.name = CleanName(HidProduct(*c));
+            s.kind = DeviceKind::Mouse;
+            s.via = L"2.4 GHz receiver";
+            s.percent = percent;
+            s.charging = (power & 0x80) != 0;
+            ctx.Add(s, 0x3434, rpid);
+            break;
         }
-        if (!connected) continue;
-        if (!UltraQuery(d, kUltraMouseReport, 0x06, r)) continue;
-        BYTE power = r[20];  // payload byte 19
-        int percent = power & 0x7F;
-        if (percent < 1 || percent > 100) continue;
-        DeviceStatus s;
-        s.key = L"keychron:" + Hex4(kUltraLink8k);
-        s.name = CleanName(HidProduct(*c));
-        s.kind = DeviceKind::Mouse;
-        s.via = L"2.4 GHz receiver";
-        s.percent = percent;
-        s.charging = (power & 0x80) != 0;
-        ctx.Add(s, 0x3434, kUltraLink8k);
-        return;
     }
 }
 

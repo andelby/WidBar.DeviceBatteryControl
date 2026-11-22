@@ -223,7 +223,10 @@ void PollCorsair(PollContext& ctx) {
                 s.via = target == 0x08 ? L"USB / Bluetooth" : L"Corsair receiver";
                 s.percent = Clamp100((int)(level + 5) / 10);
                 unsigned charge = 0;
-                if (b.Get(target, 0x10, charge)) s.charging = charge == 1 || charge == 3;
+                if (b.Get(target, 0x10, charge)) {
+                    s.charging = charge == 1 || charge == 3;
+                    s.full = charge == 3;  // charged (PR #632)
+                }
                 ctx.out.push_back(s);
                 any = true;
             }

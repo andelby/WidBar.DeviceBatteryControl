@@ -36,6 +36,12 @@ std::vector<BYTE> RkReply(BYTE basics = 0x22, BYTE sn = 0x02, BYTE online = 0x01
 // EWEADN replies: 03 50 <ack> <len> 00 <sub> <data>.
 std::vector<BYTE> EweadnReply(BYTE sub, BYTE data) { return Frame({ 0x03, 0x50, 0x00, 0x01, 0x00, sub, data }); }
 
+// Captured from a real S9 Pro 8K on its 2.4 GHz receiver (372E:1026, firmware v1052):
+// 03 50 00 0B 00 01 5D ... -> 0x5D = 93 %, bit 7 clear.
+std::vector<BYTE> EweadnBasicsReply(BYTE basics) {
+    return Frame({ 0x03, 0x50, 0x00, 0x0B, 0x00, 0x01, basics, 0x21, 0x07, 0x01, 0x90, 0x65, 0x04, 0xA5, 0x5A, 0x00 });
+}
+
 PollContext Poll(USHORT pid, std::vector<std::vector<BYTE>> replies) {
     pending = std::move(replies);
     sent.clear();
@@ -117,6 +123,27 @@ int main() {
     // EWEADN S9 Ultra cable: no link check.
     ctx = Poll(0x1027, { EweadnReply(0x81, 80) });
     assert(sent.size() == 1 && ctx.out.size() == 1 && ctx.out[0].percent == 80 && ctx.out[0].name == L"EWEADN S9 Ultra");
+
+    // S9 Pro 8K receiver (372E:1026): the same link check, then the real 11-byte basics reply.
+    ctx = Poll(0x1026, { EweadnReply(0x00, 0x01), EweadnBasicsReply(0x5D) });
+    assert(sent.size() == 2 && sent[0][5] == 0x47 && sent[1][5] == 0x4F && sent[1][6] == 0x81);
+    assert(ctx.out.size() == 1 && ctx.out[0].percent == 93 && !ctx.out[0].charging);
+    assert(ctx.out[0].name == L"EWEADN wireless mouse" && ctx.out[0].via == L"2.4 GHz receiver");
+
+    // The other S9 receiver ids share the same protocol.
+    for (USHORT pid : { 0x1033, 0x1055 }) {
+        ctx = Poll(pid, { EweadnReply(0x00, 0x01), EweadnReply(0x81, 64) });
+        assert(ctx.out.size() == 1 && ctx.out[0].percent == 64 && ctx.IsClaimed(0x372E, pid));
+    }
+
+    // S9 Pro / Max / Ultra+ on their USB cables (S9 Ultra is covered above).
+    ctx = Poll(0x1029, { EweadnReply(0x81, 74) });
+    assert(ctx.out.size() == 1 && ctx.out[0].name == L"EWEADN S9 Pro" && ctx.out[0].via == L"USB cable");
+    assert(ctx.out[0].percent == 74);
+    ctx = Poll(0x105E, { EweadnReply(0x81, 55) });
+    assert(ctx.out.size() == 1 && ctx.out[0].name == L"EWEADN S9 Max" && ctx.out[0].percent == 55);
+    ctx = Poll(0x108D, { EweadnReply(0x81, 44) });
+    assert(ctx.out.size() == 1 && ctx.out[0].name == L"EWEADN S9 Ultra+" && ctx.out[0].percent == 44);
 
     // Other 372E products (AULA, VGN, unknown) are never opened.
     int before = opens;

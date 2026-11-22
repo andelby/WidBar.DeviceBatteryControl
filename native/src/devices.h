@@ -2,8 +2,17 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <cstdint>
 
 enum class DeviceKind { Other, Mouse, Headset, Keyboard, Gamepad, Phone, Microphone, Speaker };
+
+// One battery of a device with several, e.g. the left earbud, the right one and the case (PR #3946).
+struct BatteryComponent {
+    std::wstring name;      // L"Left", L"Right", L"Case", ...
+    int percent = -1;       // 0..100, or -1 when unknown
+    bool charging = false;
+    bool full = false;
+};
 
 // One battery-powered device, as seen during a single poll.
 struct DeviceStatus {
@@ -23,6 +32,10 @@ struct DeviceStatus {
     int  graceSec   = 0;       // keep showing the last value this long if the device stops answering
     unsigned short vid = 0;    // USB / Bluetooth HID vendor id when known (picks the brand color)
     bool unsupported = false;  // seen but no driver reads its battery: listed in the menu only (PR #2463)
+    std::vector<BatteryComponent> batteries;  // each battery, when the device reports several (PR #3946)
+    bool hasCapacity = false;               // capacities below are reported by the hardware (PR #3946)
+    uint32_t designCapacityMwh = 0;
+    uint32_t fullChargeCapacityMwh = 0;
 };
 
 // Queries every supported device. Blocking (can take a second or two); call from a worker thread.
