@@ -28,21 +28,21 @@ internal static class BatteryAppearance
         };
     }
 
-    public static void ApplyIcon(FontIcon icon, BatteryDevice device, BatterySettings settings)
+    public static void ApplyIcon(FontIcon icon, BatteryDevice device, BatterySettings settings, ElementTheme? theme = null)
     {
         icon.Glyph = DeviceIcons.Glyph(device, settings);
         if (Accessibility.HighContrast || settings.AppearanceFor(device.Kind).Color == DeviceColor.System)
             icon.ClearValue(IconElement.ForegroundProperty);
-        else icon.Foreground = new SolidColorBrush(ColorFor(device.Kind, settings, icon.ActualTheme));
+        else icon.Foreground = new SolidColorBrush(ColorFor(device.Kind, settings, theme ?? icon.ActualTheme));
     }
 
-    public static void ApplyValue(TextBlock text, BatteryDevice device, BatterySettings settings)
+    public static void ApplyValue(TextBlock text, BatteryDevice device, BatterySettings settings, ElementTheme? theme = null)
     {
         text.Style = settings.HighlightLowBattery && device.Percentage <= settings.LowBatteryThreshold
             ? (Style)Application.Current.Resources["LowBatteryTextStyle"] : null;
         text.ClearValue(TextBlock.ForegroundProperty);
         if (text.Style is null && !Accessibility.HighContrast && settings.AppearanceFor(device.Kind).Color != DeviceColor.System)
-            text.Foreground = new SolidColorBrush(ColorFor(device.Kind, settings, text.ActualTheme));
+            text.Foreground = new SolidColorBrush(ColorFor(device.Kind, settings, theme ?? text.ActualTheme));
     }
 
     public static string Label(BatteryDevice device, BatterySettings settings) => settings.LabelMode switch

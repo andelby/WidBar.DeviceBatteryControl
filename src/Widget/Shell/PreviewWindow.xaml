@@ -9,9 +9,12 @@
             </ComboBox>
             <Button x:Name="SettingsButton" Click="OnSettings" />
         </StackPanel>
-        <Border Grid.Row="1" Style="{StaticResource SectionCardStyle}" Padding="0" Height="40" HorizontalAlignment="Left">
-            <ContentControl x:Name="TaskbarContent" VerticalContentAlignment="Stretch" />
-        </Border>
+        <ScrollViewer Grid.Row="1" MaxHeight="72" HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled">
+            <Border Style="{StaticResource SectionCardStyle}" Padding="0" Height="48" HorizontalAlignment="Left">
+                <ContentControl x:Name="TaskbarContent" VerticalContentAlignment="Stretch" />
+            </Border>
+        </ScrollViewer>
         <ContentControl x:Name="FlyoutContent" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
     </Grid>
 </Window>

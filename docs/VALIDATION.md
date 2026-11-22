@@ -1,5 +1,26 @@
 # Validation
 
+## Version 0.5.0
+
+Checked on Windows 11 x64 on 22 November 2026.
+
+- Passed 53 C# tests and 13 comparisons against Stock Watcher controls/layout.
+- New layout tests cover compact rows with two, three and ten devices, label
+  positions, hidden icons/labels, width allocation, settings round trips, invalid
+  settings and maximum supported sizes across layouts, densities and counts.
+- Layout metrics are shared by the taskbar renderer and SDK width calculation.
+  The default two-device layout remains 176 DIPs wide. Two-row layouts keep
+  labels inline and constrain text/icon sizes to fit the 48-DIP surface.
+- The preview now uses the same 48-DIP height, including the settings sample.
+  Wide configurations scroll horizontally in the preview. Labels trim within
+  their configured width, and tooltips retain full names.
+- Opened the compact two-row demo and settings in a responsive standalone window.
+- New taskbar elements receive their parent's actual theme when color choices
+  are applied, including elements created after a theme change.
+- Both resource files have the same 143 keys. The footer links to the upstream
+  repository and includes a localized fork acknowledgement and contributor thanks.
+- Release compilation passed with no warnings or errors.
+
 ## Version 0.4.0
 
 Checked on Windows 11 x64 on 22 November 2026.

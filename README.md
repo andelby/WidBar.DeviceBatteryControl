@@ -31,7 +31,14 @@ percent symbol and low-battery highlighting. Changes appear in the live preview.
 Choose up to ten devices automatically or select specific registered devices.
 The widget hides from the taskbar when none of the selected devices is connected;
 "Show even without devices" can keep it visible and is off by default.
-The scrolling settings footer shows the widget name and a GitHub link.
+Taskbar layout options include three density levels, a side-by-side or two-row
+arrangement, label position and width, separate label/value text sizes, and icon
+size and position. The two-row layout keeps labels beside values and limits sizes
+to fit the 48-DIP taskbar preview. The live settings preview uses the same layout
+metrics as the installed widget.
+
+The scrolling footer links to this project and the original repository, identifies
+the project as a fork, and thanks krisgfx9 and the contributors for their work.
 
 The history chart uses the same line, gradient, marker and entrance treatment
 as Stock Watcher. Its horizontal axis covers the real readings available within
@@ -63,6 +70,7 @@ dotnet build src/Widget/DeviceBatteryControl.Widget.csproj -c Debug -p:Platform=
 
 Add `--demo` for sample devices or `--lang it-IT` to preview Italian. Use
 `--settings` to open settings or `--device demo-mouse` to open a demo detail page.
+Add `--compact` to preview device names in the compact two-row arrangement.
 The regular WidBar widget always uses live discovery. Install the MSIX and add Device Battery
 Control from WidBar's widget picker.
 

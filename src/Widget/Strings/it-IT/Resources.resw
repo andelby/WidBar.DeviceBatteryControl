@@ -125,4 +125,24 @@
   <data name="ShowWhenEmpty" xml:space="preserve"><value>Mostra anche senza dispositivi</value></data>
   <data name="SelectedCount" xml:space="preserve"><value>{0}/10 selezionati</value></data>
   <data name="SampleCount" xml:space="preserve"><value>{0} campioni</value></data>
+  <data name="TaskbarLayout" xml:space="preserve"><value>Layout della taskbar</value></data>
+  <data name="DeviceArrangement" xml:space="preserve"><value>Disposizione dispositivi</value></data>
+  <data name="LayoutHorizontal" xml:space="preserve"><value>Affiancati</value></data>
+  <data name="LayoutTwoRows" xml:space="preserve"><value>Su due righe</value></data>
+  <data name="LayoutDensity" xml:space="preserve"><value>Densità</value></data>
+  <data name="DensityCompact" xml:space="preserve"><value>Compatta</value></data>
+  <data name="DensityStandard" xml:space="preserve"><value>Normale</value></data>
+  <data name="DensityComfortable" xml:space="preserve"><value>Ampia</value></data>
+  <data name="IconPosition" xml:space="preserve"><value>Posizione icona</value></data>
+  <data name="IconSize" xml:space="preserve"><value>Dimensione icone</value></data>
+  <data name="ValueFontSize" xml:space="preserve"><value>Dimensione valore</value></data>
+  <data name="LabelPosition" xml:space="preserve"><value>Posizione etichetta</value></data>
+  <data name="LabelFontSize" xml:space="preserve"><value>Dimensione etichetta</value></data>
+  <data name="LabelWidth" xml:space="preserve"><value>Larghezza etichetta</value></data>
+  <data name="PositionAbove" xml:space="preserve"><value>Sopra</value></data>
+  <data name="PositionBelow" xml:space="preserve"><value>Sotto</value></data>
+  <data name="PositionBefore" xml:space="preserve"><value>Sinistra</value></data>
+  <data name="PositionAfter" xml:space="preserve"><value>Destra</value></data>
+  <data name="ForkIntro" xml:space="preserve"><value>Questo progetto è un fork di </value></data>
+  <data name="ForkThanks" xml:space="preserve"><value>. Ringraziamo krisgfx9 e i contributori per lo sviluppo dei protocolli e il supporto dei dispositivi.</value></data>
 </root>

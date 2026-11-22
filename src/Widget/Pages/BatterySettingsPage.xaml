@@ -40,9 +40,13 @@
                     <Border Grid.Row="1" Height="72" CornerRadius="{StaticResource ControlCornerRadius}"
                             Background="{ThemeResource LayerFillColorAltBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
-                        <ContentControl x:Name="SampleHost" Height="48" Padding="12,5"
-                                        HorizontalAlignment="Center" VerticalAlignment="Center"
-                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                        <ScrollViewer HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled"
+                                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <ContentControl x:Name="SampleHost" Height="48" Padding="12,0"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                        </ScrollViewer>
                     </Border>
                 </Grid>
             </Border>
@@ -88,6 +92,35 @@
                 <views:SettingsCard x:Name="LabelModeCard" Glyph="&#xE8D2;">
                     <ComboBox x:Name="LabelModePicker" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
                 </views:SettingsCard>
+                <Expander Style="{StaticResource CardExpanderStyle}">
+                    <Expander.Header><views:SettingsCard x:Name="LayoutCard" Glyph="&#xE8A9;" Placement="ExpanderHeader" /></Expander.Header>
+                    <StackPanel>
+                        <views:SettingsCard x:Name="ArrangementCard" Placement="ExpanderRow" ShowDivider="False">
+                            <ComboBox x:Name="ArrangementPicker" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
+                        </views:SettingsCard>
+                        <views:SettingsCard x:Name="DensityCard" Placement="ExpanderRow">
+                            <ComboBox x:Name="DensityPicker" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
+                        </views:SettingsCard>
+                        <views:SettingsCard x:Name="ValueSizeCard" Placement="ExpanderRow">
+                            <NumberBox x:Name="ValueSizeBox" Width="120" Minimum="10" Maximum="18" SpinButtonPlacementMode="Compact" ValueChanged="OnNumberChanged" />
+                        </views:SettingsCard>
+                        <views:SettingsCard x:Name="IconPositionCard" Placement="ExpanderRow">
+                            <ComboBox x:Name="IconPositionPicker" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
+                        </views:SettingsCard>
+                        <views:SettingsCard x:Name="IconSizeCard" Placement="ExpanderRow">
+                            <NumberBox x:Name="IconSizeBox" Width="120" Minimum="12" Maximum="24" SpinButtonPlacementMode="Compact" ValueChanged="OnNumberChanged" />
+                        </views:SettingsCard>
+                        <views:SettingsCard x:Name="LabelPositionCard" Placement="ExpanderRow">
+                            <ComboBox x:Name="LabelPositionPicker" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
+                        </views:SettingsCard>
+                        <views:SettingsCard x:Name="LabelSizeCard" Placement="ExpanderRow">
+                            <NumberBox x:Name="LabelSizeBox" Width="120" Minimum="9" Maximum="14" SpinButtonPlacementMode="Compact" ValueChanged="OnNumberChanged" />
+                        </views:SettingsCard>
+                        <views:SettingsCard x:Name="LabelWidthCard" Placement="ExpanderRow">
+                            <NumberBox x:Name="LabelWidthBox" Width="120" Minimum="40" Maximum="160" SmallChange="8" SpinButtonPlacementMode="Compact" ValueChanged="OnNumberChanged" />
+                        </views:SettingsCard>
+                    </StackPanel>
+                </Expander>
                 <views:SettingsCard x:Name="PercentCard" Glyph="&#xE94C;">
                     <ToggleSwitch x:Name="PercentToggle" Toggled="OnToggled" />
                 </views:SettingsCard>
@@ -109,6 +142,10 @@
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <HyperlinkButton Content="GitHub" NavigateUri="https://github.com/andelby/WidBar.DeviceBatteryControl" />
                 </StackPanel>
+                <TextBlock MaxWidth="600" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Margin="8,0,8,12"
+                           Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                    <Run x:Name="ForkIntro" /><Hyperlink NavigateUri="https://github.com/krisgfx9/Wireless-Device-Battery-Monitor"><Run Text="Wireless Device Battery Monitor" /></Hyperlink><Run x:Name="ForkThanks" />
+                </TextBlock>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -19,6 +19,8 @@ public sealed partial class BatterySettingsPage : UserControl
     private bool _ready;
     private bool _listening;
     private string _deviceSignature = "";
+    private TaskbarLayout? _positionChoicesLayout;
+    private TaskbarLabelPosition[] _labelPositions = [];
 
     public BatterySettingsPage(IWidgetSettingsContext context, BatteryMonitor monitor)
     {
@@ -50,6 +52,24 @@ public sealed partial class BatterySettingsPage : UserControl
         LabelModeCard.Header = BatteryLoc.Get("PreviewLabels");
         LabelModePicker.ItemsSource = new[] { BatteryLoc.Get("LabelNone"), BatteryLoc.Get("LabelDeviceName"), BatteryLoc.Get("LabelCustom") };
         LabelModePicker.SelectedIndex = (int)_current.LabelMode;
+        LayoutCard.Header = BatteryLoc.Get("TaskbarLayout");
+        ArrangementCard.Header = BatteryLoc.Get("DeviceArrangement");
+        ArrangementPicker.ItemsSource = new[] { BatteryLoc.Get("LayoutHorizontal"), BatteryLoc.Get("LayoutTwoRows") };
+        ArrangementPicker.SelectedIndex = (int)_current.Layout;
+        DensityCard.Header = BatteryLoc.Get("LayoutDensity");
+        DensityPicker.ItemsSource = new[] { BatteryLoc.Get("DensityCompact"), BatteryLoc.Get("DensityStandard"), BatteryLoc.Get("DensityComfortable") };
+        DensityPicker.SelectedIndex = (int)_current.Density;
+        IconPositionCard.Header = BatteryLoc.Get("IconPosition");
+        IconPositionPicker.ItemsSource = new[] { BatteryLoc.Get("PositionBefore"), BatteryLoc.Get("PositionAfter") };
+        IconPositionPicker.SelectedIndex = (int)_current.IconPosition;
+        IconSizeCard.Header = BatteryLoc.Get("IconSize");
+        ValueSizeCard.Header = BatteryLoc.Get("ValueFontSize");
+        LabelPositionCard.Header = BatteryLoc.Get("LabelPosition");
+        LabelSizeCard.Header = BatteryLoc.Get("LabelFontSize");
+        LabelWidthCard.Header = BatteryLoc.Get("LabelWidth");
+        ForkIntro.Text = BatteryLoc.Get("ForkIntro");
+        ForkThanks.Text = BatteryLoc.Get("ForkThanks");
+        SyncLayoutControls();
         PercentCard.Header = BatteryLoc.Get("ShowPercentSymbol");
         PercentToggle.IsOn = _current.ShowPercentSymbol;
         HighlightCard.Header = BatteryLoc.Get("HighlightLowBattery");
@@ -83,7 +103,10 @@ public sealed partial class BatterySettingsPage : UserControl
     }
     private void OnMonitorChanged(object? sender, EventArgs args) { UpdateDevices(); RenderSample(); }
     private void OnChanged(object sender, SelectionChangedEventArgs args) => SaveDraft();
-    private void OnNumberChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => SaveDraft();
+    private void OnNumberChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+        if (double.IsFinite(args.NewValue)) SaveDraft();
+    }
     private void OnToggled(object sender, RoutedEventArgs args) => SaveDraft();
     private void OnAppearanceChanged(object? sender, EventArgs args) => SaveDraft();
     private void OnAutomaticToggled(object sender, RoutedEventArgs args)
@@ -117,6 +140,29 @@ public sealed partial class BatterySettingsPage : UserControl
         DevicePicker.IsEnabled = !AutomaticToggle.IsOn;
         CountCard.IsEnabled = AutomaticToggle.IsOn;
         SelectionCount.Text = AutomaticToggle.IsOn ? BatteryLoc.Get("Automatic") : BatteryLoc.Format("SelectedCount", DevicePicker.SelectedItems.Count);
+    }
+
+    private void SyncLayoutControls()
+    {
+        var wasReady = _ready;
+        _ready = false;
+        if (_positionChoicesLayout != _current.Layout)
+        {
+            _positionChoicesLayout = _current.Layout;
+            _labelPositions = _current.Layout == TaskbarLayout.TwoRows
+                ? [TaskbarLabelPosition.Before, TaskbarLabelPosition.After] : Enum.GetValues<TaskbarLabelPosition>();
+            LabelPositionPicker.ItemsSource = _labelPositions.Select(x => BatteryLoc.Get("Position" + x)).ToArray();
+        }
+        LabelPositionPicker.SelectedIndex = Array.IndexOf(_labelPositions, _current.LabelPosition);
+        ValueSizeBox.Maximum = _current.Layout == TaskbarLayout.TwoRows ? 16 : 18;
+        ValueSizeBox.Value = _current.ValueFontSize;
+        IconSizeBox.Maximum = _current.Layout == TaskbarLayout.TwoRows ? 18 : 24;
+        IconSizeBox.Value = _current.IconSize;
+        LabelSizeBox.Value = _current.LabelFontSize;
+        LabelWidthBox.Value = _current.LabelWidth;
+        IconPositionCard.IsEnabled = IconSizeCard.IsEnabled = _current.ShowIcons;
+        LabelPositionCard.IsEnabled = LabelSizeCard.IsEnabled = LabelWidthCard.IsEnabled = _current.LabelMode != PreviewLabelMode.None;
+        _ready = wasReady;
     }
 
     private void UpdateDevices()
@@ -168,10 +214,19 @@ public sealed partial class BatterySettingsPage : UserControl
             ShowPercentSymbol = PercentToggle.IsOn,
             HighlightLowBattery = HighlightToggle.IsOn,
             LabelMode = (PreviewLabelMode)Math.Max(0, LabelModePicker.SelectedIndex),
+            Layout = (TaskbarLayout)Math.Max(0, ArrangementPicker.SelectedIndex),
+            Density = (TaskbarDensity)Math.Max(0, DensityPicker.SelectedIndex),
+            IconPosition = (TaskbarIconPosition)Math.Max(0, IconPositionPicker.SelectedIndex),
+            LabelPosition = _labelPositions[Math.Max(0, LabelPositionPicker.SelectedIndex)],
+            IconSize = (int)IconSizeBox.Value,
+            ValueFontSize = (int)ValueSizeBox.Value,
+            LabelFontSize = (int)LabelSizeBox.Value,
+            LabelWidth = (int)LabelWidthBox.Value,
             MouseAppearance = MouseEditor.Value,
             KeyboardAppearance = KeyboardEditor.Value,
             HeadphonesAppearance = HeadphonesEditor.Value
         }).ToJson());
+        SyncLayoutControls();
         RenderSample();
         _context.SaveSettings(_current.ToJson());
     }

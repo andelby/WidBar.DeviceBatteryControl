@@ -22,6 +22,10 @@ public sealed partial class PreviewWindow : Window
     {
         InitializeComponent();
         _demo = Environment.GetCommandLineArgs().Contains("--demo");
+        if (Environment.GetCommandLineArgs().Contains("--compact"))
+            _settings = new BatterySettings { PreviewDeviceCount = 3, Layout = TaskbarLayout.TwoRows, Density = TaskbarDensity.Compact,
+                LabelMode = PreviewLabelMode.DeviceName, LabelPosition = TaskbarLabelPosition.Before,
+                IconSize = 12, ValueFontSize = 12, LabelFontSize = 10, LabelWidth = 64 };
         Title = "Device Battery Control" + (_demo ? " · " + BatteryLoc.Get("Demo") : "");
         SystemBackdrop = new MicaBackdrop();
         AppWindow.Resize(new Windows.Graphics.SizeInt32(800, 940));

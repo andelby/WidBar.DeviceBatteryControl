@@ -125,4 +125,24 @@
   <data name="ShowWhenEmpty" xml:space="preserve"><value>Show even without devices</value></data>
   <data name="SelectedCount" xml:space="preserve"><value>{0}/10 selected</value></data>
   <data name="SampleCount" xml:space="preserve"><value>{0} samples</value></data>
+  <data name="TaskbarLayout" xml:space="preserve"><value>Taskbar layout</value></data>
+  <data name="DeviceArrangement" xml:space="preserve"><value>Device arrangement</value></data>
+  <data name="LayoutHorizontal" xml:space="preserve"><value>Side by side</value></data>
+  <data name="LayoutTwoRows" xml:space="preserve"><value>Two rows</value></data>
+  <data name="LayoutDensity" xml:space="preserve"><value>Density</value></data>
+  <data name="DensityCompact" xml:space="preserve"><value>Compact</value></data>
+  <data name="DensityStandard" xml:space="preserve"><value>Standard</value></data>
+  <data name="DensityComfortable" xml:space="preserve"><value>Spacious</value></data>
+  <data name="IconPosition" xml:space="preserve"><value>Icon position</value></data>
+  <data name="IconSize" xml:space="preserve"><value>Icon size</value></data>
+  <data name="ValueFontSize" xml:space="preserve"><value>Battery value size</value></data>
+  <data name="LabelPosition" xml:space="preserve"><value>Label position</value></data>
+  <data name="LabelFontSize" xml:space="preserve"><value>Label size</value></data>
+  <data name="LabelWidth" xml:space="preserve"><value>Label width</value></data>
+  <data name="PositionAbove" xml:space="preserve"><value>Above</value></data>
+  <data name="PositionBelow" xml:space="preserve"><value>Below</value></data>
+  <data name="PositionBefore" xml:space="preserve"><value>Left</value></data>
+  <data name="PositionAfter" xml:space="preserve"><value>Right</value></data>
+  <data name="ForkIntro" xml:space="preserve"><value>This project is a fork of </value></data>
+  <data name="ForkThanks" xml:space="preserve"><value>. We thank krisgfx9 and the contributors for the device protocols and hardware support.</value></data>
 </root>
