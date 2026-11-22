@@ -53,6 +53,11 @@ public sealed partial class PreviewWindow : Window
                         DateTimeOffset.UtcNow.AddMinutes(-1440 + i * 10));
         }
         await _monitor.RefreshAsync();
+        var arguments = Environment.GetCommandLineArgs();
+        if (arguments.Contains("--settings")) OnSettings(this, new RoutedEventArgs());
+        var deviceIndex = Array.IndexOf(arguments, "--device");
+        if (deviceIndex >= 0 && deviceIndex + 1 < arguments.Length)
+            _flyout.OpenDevice(arguments[deviceIndex + 1]);
         if (Environment.GetCommandLineArgs().Contains("--diagnostics"))
         {
             var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

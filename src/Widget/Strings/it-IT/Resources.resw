@@ -87,4 +87,48 @@
   <data name="LevelHigh" xml:space="preserve"><value>Alta</value></data>
   <data name="LevelFull" xml:space="preserve"><value>Carica</value></data>
   <data name="LevelEmpty" xml:space="preserve"><value>Scarica</value></data>
+  <data name="AppearanceSection" xml:space="preserve"><value>Aspetto</value></data>
+  <data name="ShowPreviewIcons" xml:space="preserve"><value>Mostra icone nella taskbar</value></data>
+  <data name="PreviewLabels" xml:space="preserve"><value>Etichette nella taskbar</value></data>
+  <data name="LabelNone" xml:space="preserve"><value>Nascondi nomi</value></data>
+  <data name="LabelDeviceName" xml:space="preserve"><value>Nomi dei dispositivi</value></data>
+  <data name="LabelCustom" xml:space="preserve"><value>Etichette personalizzate</value></data>
+  <data name="ShowPercentSymbol" xml:space="preserve"><value>Mostra simbolo percentuale</value></data>
+  <data name="HighlightLowBattery" xml:space="preserve"><value>Evidenzia batteria scarica</value></data>
+  <data name="HighlightDescription" xml:space="preserve"><value>Usa il colore di avviso di sistema sotto la soglia scelta.</value></data>
+  <data name="ChartScale" xml:space="preserve"><value>Scala del grafico</value></data>
+  <data name="ChartScaleDescription" xml:space="preserve"><value>L’asse temporale segue le letture effettivamente disponibili.</value></data>
+  <data name="ScaleAutomatic" xml:space="preserve"><value>Automatica</value></data>
+  <data name="ScaleFull" xml:space="preserve"><value>Completa (0–100%)</value></data>
+  <data name="DeviceMouse" xml:space="preserve"><value>Mouse</value></data>
+  <data name="DeviceKeyboard" xml:space="preserve"><value>Tastiera</value></data>
+  <data name="DeviceHeadphones" xml:space="preserve"><value>Cuffie</value></data>
+  <data name="DeviceAppearanceDescription" xml:space="preserve"><value>Icona, colore ed etichetta</value></data>
+  <data name="DeviceIcon" xml:space="preserve"><value>Icona</value></data>
+  <data name="DeviceColor" xml:space="preserve"><value>Colore</value></data>
+  <data name="CustomLabel" xml:space="preserve"><value>Etichetta personalizzata</value></data>
+  <data name="CustomLabelDescription" xml:space="preserve"><value>Usata quando si scelgono le etichette personalizzate nella taskbar.</value></data>
+  <data name="PickColor" xml:space="preserve"><value>Scegli un colore personalizzato</value></data>
+  <data name="ColorSystem" xml:space="preserve"><value>Sistema</value></data>
+  <data name="ColorAccent" xml:space="preserve"><value>Accento Windows</value></data>
+  <data name="ColorBlue" xml:space="preserve"><value>Blu</value></data>
+  <data name="ColorGreen" xml:space="preserve"><value>Verde</value></data>
+  <data name="ColorPurple" xml:space="preserve"><value>Viola</value></data>
+  <data name="ColorOrange" xml:space="preserve"><value>Arancione</value></data>
+  <data name="ColorCustom" xml:space="preserve"><value>Personalizzato</value></data>
+  <data name="IconMouse" xml:space="preserve"><value>Mouse</value></data>
+  <data name="IconTouchpad" xml:space="preserve"><value>Touchpad</value></data>
+  <data name="IconBluetooth" xml:space="preserve"><value>Bluetooth</value></data>
+  <data name="IconKeyboardStandard" xml:space="preserve"><value>Tastiera standard</value></data>
+  <data name="IconKeyboardClassic" xml:space="preserve"><value>Tastiera classica</value></data>
+  <data name="IconKeyboardFull" xml:space="preserve"><value>Tastiera completa</value></data>
+  <data name="IconHeadphone" xml:space="preserve"><value>Cuffie</value></data>
+  <data name="IconHeadset" xml:space="preserve"><value>Cuffie con microfono</value></data>
+  <data name="IconHeadphoneAlternative" xml:space="preserve"><value>Cuffie (variante)</value></data>
+  <data name="IconDefault" xml:space="preserve"><value>Dispositivo predefinito</value></data>
+  <data name="ForkCredit" xml:space="preserve"><value>Device Battery Control è un fork di BatteryHub (Wireless Device Battery Monitor).</value></data>
+  <data name="ProjectSource" xml:space="preserve"><value>Codice sorgente</value></data>
+  <data name="UpstreamProject" xml:space="preserve"><value>Progetto originale</value></data>
+  <data name="PreviewSampleNote" xml:space="preserve"><value>Valori di esempio quando nessun dispositivo è collegato.</value></data>
+  <data name="HistorySingle" xml:space="preserve"><value>Prima lettura registrata. I nuovi punti compariranno con le prossime letture.</value></data>
 </root>

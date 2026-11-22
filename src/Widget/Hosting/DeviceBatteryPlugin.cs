@@ -17,7 +17,7 @@ public sealed class DeviceBatteryPlugin : WidgetPluginBase, IConfigurableWidgetP
     private bool _disposed;
     public override string Id => "com.widbar.devicebatterycontrol";
     public override string Name => "Device Battery Control";
-    public override string Version => "0.2.0";
+    public override string Version => "0.3.0";
     public override int PreviewLogicalWidth => _settings.PreviewWidth;
     public override int FlyoutWidth => 620;
     public override int FlyoutHeight => 650;

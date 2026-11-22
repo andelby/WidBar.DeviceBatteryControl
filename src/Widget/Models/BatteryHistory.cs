@@ -21,6 +21,7 @@ public sealed class BatteryHistory
         }
         samples.RemoveAll(x => now - x.Time > TimeSpan.FromHours(24));
         var last = samples.LastOrDefault();
+        if (last is not null && now <= last.Time) return false;
         if (last is not null && now - last.Time < TimeSpan.FromMinutes(5) && last.Percentage == device.Percentage)
             return false;
         samples.Add(new(now, device.Percentage.Value, device.Source, device.Transport));
@@ -29,7 +30,8 @@ public sealed class BatteryHistory
     }
 
     public IReadOnlyList<BatterySample> Get(string id, DateTimeOffset now) => Devices.TryGetValue(id, out var samples)
-        ? samples.Where(x => x.Time >= now.AddHours(-24) && x.Time <= now).ToArray() : [];
+        ? samples.Where(x => x.Time >= now.AddHours(-24) && x.Time <= now)
+            .OrderBy(x => x.Time).GroupBy(x => x.Time).Select(x => x.Last()).ToArray() : [];
 
     public bool Remap(IReadOnlyDictionary<string, string> aliases)
     {
@@ -66,7 +68,7 @@ public sealed class BatteryHistory
         Devices = Devices.Where(x => !string.IsNullOrEmpty(x.Key) && x.Value is not null)
             .Select(x => new KeyValuePair<string, List<BatterySample>>(x.Key, x.Value
                 .Where(s => s is not null && s.Percentage is >= 0 and <= 100 && s.Time >= now.AddHours(-24) && s.Time <= now)
-                .OrderBy(s => s.Time).TakeLast(MaximumSamples).ToList()))
+                .OrderBy(s => s.Time).GroupBy(s => s.Time).Select(s => s.Last()).TakeLast(MaximumSamples).ToList()))
             .Where(x => x.Value.Count > 0).OrderByDescending(x => x.Value[^1].Time).Take(MaximumDevices)
             .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
     }

@@ -25,6 +25,18 @@ The widget supports light/dark themes and English/Italian UI resources. Device
 icons use Segoe Fluent Icons throughout. Layout, controls and hover behavior
 follow the existing Weather and Stock Watcher widgets.
 
+Settings include native icon choices for mouse, keyboard and headphones, system
+or custom colors, device names or short labels, and switches for icons, the
+percent symbol and low-battery highlighting. Changes appear in the live preview.
+The settings footer links to this fork and the original BatteryHub project.
+
+The history chart uses the same line, gradient, marker and entrance treatment
+as Stock Watcher. Its horizontal axis covers the real readings available within
+the last 24 hours. A first reading appears in the center; later readings span
+the plot according to their actual timestamps. Missing observations remain gaps.
+The vertical scale can adapt to the readings or stay fixed at 0–100%. Hovering
+shows the recorded value and time. The display never invents battery readings.
+
 ## Build
 
 Install Visual Studio 2026 with the C++ desktop and WinUI tools, .NET 10, the
@@ -46,9 +58,14 @@ dotnet build src/Widget/DeviceBatteryControl.Widget.csproj -c Debug -p:Platform=
 ./src/Widget/bin/x64/Debug/net10.0-windows10.0.19041.0/win-x64/WidBar.DeviceBatteryControl.Widget.exe --preview
 ```
 
-Add `--demo` for sample devices or `--lang it-IT` to preview Italian. The regular
-WidBar widget always uses live discovery. Install the MSIX and add Device Battery
+Add `--demo` for sample devices or `--lang it-IT` to preview Italian. Use
+`--settings` to open settings or `--device demo-mouse` to open a demo detail page.
+The regular WidBar widget always uses live discovery. Install the MSIX and add Device Battery
 Control from WidBar's widget picker.
+
+The executable inside an MSIX layout requires package-aware activation. Use the
+unpackaged build above for direct preview launches; WidBar activates the installed
+package through its app identity.
 
 ## Device support and resource use
 
@@ -69,6 +86,11 @@ deadline and bounded output; a failed driver cannot block the WinUI thread.
 The process exits after each poll and releases its native sessions. Long-lived
 Bluetooth advertisement/session behavior is not claimed to match the original
 tray app until tested on the corresponding hardware.
+
+Charts share one renderer, redraw when data, appearance, size or theme changes,
+and keep at most 288 observations per device. The entrance runs through Windows
+Composition and respects the system animation setting. The native color picker
+is created only when opened; appearance changes do not start device discovery.
 
 ## License
 

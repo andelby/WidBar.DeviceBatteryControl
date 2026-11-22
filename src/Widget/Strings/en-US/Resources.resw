@@ -87,4 +87,48 @@
   <data name="LevelHigh" xml:space="preserve"><value>High</value></data>
   <data name="LevelFull" xml:space="preserve"><value>Full</value></data>
   <data name="LevelEmpty" xml:space="preserve"><value>Empty</value></data>
+  <data name="AppearanceSection" xml:space="preserve"><value>Appearance</value></data>
+  <data name="ShowPreviewIcons" xml:space="preserve"><value>Show taskbar icons</value></data>
+  <data name="PreviewLabels" xml:space="preserve"><value>Taskbar labels</value></data>
+  <data name="LabelNone" xml:space="preserve"><value>Hide names</value></data>
+  <data name="LabelDeviceName" xml:space="preserve"><value>Device names</value></data>
+  <data name="LabelCustom" xml:space="preserve"><value>Custom labels</value></data>
+  <data name="ShowPercentSymbol" xml:space="preserve"><value>Show percent symbol</value></data>
+  <data name="HighlightLowBattery" xml:space="preserve"><value>Highlight low battery</value></data>
+  <data name="HighlightDescription" xml:space="preserve"><value>Use the system warning color below the selected threshold.</value></data>
+  <data name="ChartScale" xml:space="preserve"><value>Chart scale</value></data>
+  <data name="ChartScaleDescription" xml:space="preserve"><value>The time axis follows the actual readings available.</value></data>
+  <data name="ScaleAutomatic" xml:space="preserve"><value>Automatic</value></data>
+  <data name="ScaleFull" xml:space="preserve"><value>Full range (0–100%)</value></data>
+  <data name="DeviceMouse" xml:space="preserve"><value>Mouse</value></data>
+  <data name="DeviceKeyboard" xml:space="preserve"><value>Keyboard</value></data>
+  <data name="DeviceHeadphones" xml:space="preserve"><value>Headphones</value></data>
+  <data name="DeviceAppearanceDescription" xml:space="preserve"><value>Icon, color and label</value></data>
+  <data name="DeviceIcon" xml:space="preserve"><value>Icon</value></data>
+  <data name="DeviceColor" xml:space="preserve"><value>Color</value></data>
+  <data name="CustomLabel" xml:space="preserve"><value>Custom label</value></data>
+  <data name="CustomLabelDescription" xml:space="preserve"><value>Used when taskbar labels are set to Custom labels.</value></data>
+  <data name="PickColor" xml:space="preserve"><value>Choose a custom color</value></data>
+  <data name="ColorSystem" xml:space="preserve"><value>System</value></data>
+  <data name="ColorAccent" xml:space="preserve"><value>Windows accent</value></data>
+  <data name="ColorBlue" xml:space="preserve"><value>Blue</value></data>
+  <data name="ColorGreen" xml:space="preserve"><value>Green</value></data>
+  <data name="ColorPurple" xml:space="preserve"><value>Purple</value></data>
+  <data name="ColorOrange" xml:space="preserve"><value>Orange</value></data>
+  <data name="ColorCustom" xml:space="preserve"><value>Custom</value></data>
+  <data name="IconMouse" xml:space="preserve"><value>Mouse</value></data>
+  <data name="IconTouchpad" xml:space="preserve"><value>Touchpad</value></data>
+  <data name="IconBluetooth" xml:space="preserve"><value>Bluetooth</value></data>
+  <data name="IconKeyboardStandard" xml:space="preserve"><value>Standard keyboard</value></data>
+  <data name="IconKeyboardClassic" xml:space="preserve"><value>Classic keyboard</value></data>
+  <data name="IconKeyboardFull" xml:space="preserve"><value>Full keyboard</value></data>
+  <data name="IconHeadphone" xml:space="preserve"><value>Headphones</value></data>
+  <data name="IconHeadset" xml:space="preserve"><value>Headset</value></data>
+  <data name="IconHeadphoneAlternative" xml:space="preserve"><value>Headphones (variant)</value></data>
+  <data name="IconDefault" xml:space="preserve"><value>Default device</value></data>
+  <data name="ForkCredit" xml:space="preserve"><value>Device Battery Control is a fork of BatteryHub (Wireless Device Battery Monitor).</value></data>
+  <data name="ProjectSource" xml:space="preserve"><value>Source code</value></data>
+  <data name="UpstreamProject" xml:space="preserve"><value>Original project</value></data>
+  <data name="PreviewSampleNote" xml:space="preserve"><value>Sample values are shown while no device is connected.</value></data>
+  <data name="HistorySingle" xml:space="preserve"><value>First reading recorded. More points will appear as fresh readings arrive.</value></data>
 </root>

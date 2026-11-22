@@ -7,6 +7,9 @@
     xmlns:controls="using:DeviceBatteryControl.Controls"
     Background="Transparent">
     <UserControl.Resources>
+        <Style x:Key="HeroDeviceIconStyle" TargetType="FontIcon" BasedOn="{StaticResource FluentFontIconStyle}">
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Style>
         <Style x:Key="HeaderButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
             <Setter Property="Width" Value="32" />
             <Setter Property="Height" Value="32" />
@@ -145,7 +148,7 @@
                             <TextBlock x:Name="HeroUpdated" Margin="0,6,0,0" Style="{StaticResource SecondaryCaptionStyle}" />
                         </StackPanel>
                         <FontIcon x:Name="HeroIcon" Grid.Column="1" FontSize="52" Margin="0,0,8,0"
-                                  VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                  VerticalAlignment="Center" Style="{StaticResource HeroDeviceIconStyle}" />
                     </Grid>
                     <Border x:Name="HistorySection" Style="{StaticResource SectionCardStyle}">
                         <StackPanel Spacing="14">

@@ -19,7 +19,7 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
         <StackPanel Padding="0,0,0,8">
             <Border Padding="16" CornerRadius="{StaticResource ControlCornerRadius}"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -58,6 +58,22 @@
                 <views:SettingsCard x:Name="ThresholdCard" Glyph="&#xE7BA;">
                     <NumberBox x:Name="Threshold" Width="120" Minimum="5" Maximum="50" SpinButtonPlacementMode="Compact" ValueChanged="OnNumberChanged" />
                 </views:SettingsCard>
+                <TextBlock x:Name="AppearanceSectionText" Style="{StaticResource SectionHeaderStyle}" />
+                <views:SettingsCard x:Name="IconsCard" Glyph="&#xE975;">
+                    <ToggleSwitch x:Name="IconsToggle" Toggled="OnToggled" />
+                </views:SettingsCard>
+                <views:SettingsCard x:Name="LabelModeCard" Glyph="&#xE8D2;">
+                    <ComboBox x:Name="LabelModePicker" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
+                </views:SettingsCard>
+                <views:SettingsCard x:Name="PercentCard" Glyph="&#xE94C;">
+                    <ToggleSwitch x:Name="PercentToggle" Toggled="OnToggled" />
+                </views:SettingsCard>
+                <views:SettingsCard x:Name="HighlightCard" Glyph="&#xE7BA;">
+                    <ToggleSwitch x:Name="HighlightToggle" Toggled="OnToggled" />
+                </views:SettingsCard>
+                <views:DeviceAppearanceEditor x:Name="MouseEditor" />
+                <views:DeviceAppearanceEditor x:Name="KeyboardEditor" />
+                <views:DeviceAppearanceEditor x:Name="HeadphonesEditor" />
                 <TextBlock x:Name="DataSectionText" Style="{StaticResource SectionHeaderStyle}" />
                 <views:SettingsCard x:Name="RefreshCard" Glyph="&#xE72C;">
                     <ComboBox x:Name="RefreshInterval" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
@@ -68,7 +84,18 @@
                 <views:SettingsCard x:Name="HistoryCard" Glyph="&#xE9D9;">
                     <ToggleSwitch x:Name="HistoryToggle" Toggled="OnToggled" />
                 </views:SettingsCard>
+                <views:SettingsCard x:Name="ChartScaleCard" Glyph="&#xE9D9;">
+                    <ComboBox x:Name="ChartScalePicker" Style="{StaticResource CardComboStyle}" SelectionChanged="OnChanged" />
+                </views:SettingsCard>
             </StackPanel>
         </ScrollViewer>
+        <StackPanel Grid.Row="2" Margin="0,12,0,0" Spacing="0">
+            <TextBlock x:Name="ForkCredit" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <HyperlinkButton x:Name="ProjectLink" NavigateUri="https://github.com/andelby/WidBar.DeviceBatteryControl" />
+                <HyperlinkButton x:Name="UpstreamLink" NavigateUri="https://github.com/krisgfx9/Wireless-Device-Battery-Monitor" />
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -49,6 +49,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         Describe(BackButton, "BackToDevices");
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+        ActualThemeChanged += (_, _) => { if (_active) Render(); };
         Render();
     }
 
@@ -125,7 +126,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
     {
         if (args.ClickedItem is BatteryDeviceRow row) OpenDevice(row.DeviceId);
     }
-    private void OpenDevice(string id)
+    internal void OpenDevice(string id)
     {
         var device = VisibleDevices().FirstOrDefault(x => x.Id == id);
         if (device is null) return;
@@ -135,6 +136,7 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         DetailPage.Visibility = Visibility.Visible;
         BackButton.Visibility = Visibility.Visible;
         RenderDetails(device);
+        HistoryChart.PlayEntrance();
         DetailPage.ChangeView(null, 0, null, true);
         if (new Windows.UI.ViewManagement.UISettings().AnimationsEnabled)
             Motion.Enter(new UIElement[] { HeroSection, HistorySection, DetailsSection }, new Vector3(24, 0, 0));
@@ -158,14 +160,14 @@ public sealed partial class BatteryFlyoutPage : UserControl, IDisposable
         HeaderSubtitle.Text = BatteryPresentation.Source(device);
         HeroValue.Text = device.Percentage?.ToString(BatteryLoc.FormattingCulture) ?? BatteryPresentation.Level(device);
         HeroUnit.Visibility = device.Percentage.HasValue ? Visibility.Visible : Visibility.Collapsed;
-        HeroIcon.Glyph = device.Glyph;
+        BatteryAppearance.ApplyIcon(HeroIcon, device, _settings);
         HeroStatus.Text = BatteryPresentation.Status(device, _settings);
         HeroUpdated.Text = device.LastReading is null ? BatteryLoc.Get("NoBatteryReading")
             : BatteryLoc.Format("UpdatedAt", device.LastReading.Value.ToLocalTime().ToString("g", BatteryLoc.FormattingCulture));
         HistorySection.Visibility = _settings.KeepHistory && !device.IsReceiverOnly ? Visibility.Visible : Visibility.Collapsed;
         var samples = _monitor.History.Get(device.Id, DateTimeOffset.UtcNow);
-        HistoryChart.SetSamples(samples);
-        HistoryHint.Text = BatteryLoc.Get(samples.Count < 2 ? "HistoryEmpty" : "HistoryHint");
+        HistoryChart.SetSamples(samples, _settings, device.Kind);
+        HistoryHint.Text = BatteryLoc.Get(samples.Count == 1 ? "HistorySingle" : samples.Count == 0 ? "HistoryEmpty" : "HistoryHint");
         var stats = new List<BatteryStatRow>
         {
             new(BatteryLoc.Get("Connection"), BatteryLoc.Get(device.IsReceiverOnly ? "ReceiverPresent" : device.IsConnected ? "Connected" : "DisconnectedOnly")),
